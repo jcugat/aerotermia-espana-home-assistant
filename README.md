@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="custom_components/aerotermia_espana/brand/icon.png" alt="Aerotermia España" width="140">
+  <img src="https://raw.githubusercontent.com/jcugat/aerotermia-espana-home-assistant/main/custom_components/aerotermia_espana/brand/icon.png" alt="Aerotermia España" width="140">
 </p>
 
 <h1 align="center">Aerotermia España para Home Assistant</h1>
