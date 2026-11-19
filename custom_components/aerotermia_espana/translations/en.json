@@ -61,6 +61,10 @@
         }
       }
     },
+    "error": {
+      "installation_id_missing": "Escribe el ID de la máquina, el número tras # en tu panel de la web.",
+      "minute_missing": "Escribe el minuto asignado, lo tienes en el paso 3 de tu panel de la web."
+    },
     "abort": {
       "already_configured": "Esta máquina ya está configurada."
     }

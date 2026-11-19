@@ -121,28 +121,38 @@ class AerotermiaConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input: dict | None = None) -> ConfigFlowResult:
         """API key, machine id and minute, all copied from the web panel."""
+        errors: dict[str, str] = {}
         if user_input is not None:
-            installation_id = int(user_input[CONF_INSTALLATION_ID])
-            await self.async_set_unique_id(str(installation_id))
-            self._abort_if_unique_id_configured()
-            self._data = {CONF_INSTALLATION_ID: installation_id}
-            self._options = {
-                CONF_API_KEY: user_input[CONF_API_KEY].strip(),
-                CONF_MINUTE: int(user_input[CONF_MINUTE]),
+            # Optional in the schema so the frontend leaves them empty, but both must be typed in.
+            errors = {
+                key: f"{key}_missing"
+                for key in (CONF_INSTALLATION_ID, CONF_MINUTE)
+                if user_input.get(key) is None
             }
-            return await self.async_step_device()
+            if not errors:
+                installation_id = int(user_input[CONF_INSTALLATION_ID])
+                await self.async_set_unique_id(str(installation_id))
+                self._abort_if_unique_id_configured()
+                self._data = {CONF_INSTALLATION_ID: installation_id}
+                self._options = {
+                    CONF_API_KEY: user_input[CONF_API_KEY].strip(),
+                    CONF_MINUTE: int(user_input[CONF_MINUTE]),
+                }
+                return await self.async_step_device()
 
+        schema = vol.Schema(
+            {
+                vol.Required(CONF_API_KEY): _PASSWORD,
+                vol.Optional(CONF_INSTALLATION_ID): sel.NumberSelector(
+                    sel.NumberSelectorConfig(min=1, mode=sel.NumberSelectorMode.BOX)
+                ),
+                vol.Optional(CONF_MINUTE): _MINUTE,
+            }
+        )
         return self.async_show_form(
             step_id="user",
-            data_schema=vol.Schema(
-                {
-                    vol.Required(CONF_API_KEY): _PASSWORD,
-                    vol.Required(CONF_INSTALLATION_ID): sel.NumberSelector(
-                        sel.NumberSelectorConfig(min=1, mode=sel.NumberSelectorMode.BOX)
-                    ),
-                    vol.Required(CONF_MINUTE): _MINUTE,
-                }
-            ),
+            data_schema=self.add_suggested_values_to_schema(schema, user_input or {}),
+            errors=errors,
         )
 
     async def async_step_device(self, user_input: dict | None = None) -> ConfigFlowResult:
