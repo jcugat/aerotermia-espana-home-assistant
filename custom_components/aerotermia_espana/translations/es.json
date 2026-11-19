@@ -1,0 +1,127 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Conectar con Aerotermia España",
+        "description": "Primero da de alta la máquina en https://aerotermiaespana.sytes.net (paso 1 del panel, con el tipo de contador en Total Acumulado). Después copia aquí la API Key, el ID de la máquina (#) y el minuto asignado.",
+        "data": {
+          "api_key": "API Key",
+          "installation_id": "ID de la máquina",
+          "minute": "Minuto asignado"
+        },
+        "data_description": {
+          "api_key": "La de tu panel en la web.",
+          "installation_id": "El número tras # en el panel, por ejemplo 24.",
+          "minute": "El minuto que la web asignó a tu máquina (paso 3). No lo cambies salvo que lo cambie la web."
+        }
+      },
+      "device": {
+        "title": "Bomba de calor",
+        "description": "Elige el dispositivo ESPHome de tu bomba de calor (firmware Midea-heat-pump-ESPHome) para encontrar sus sensores automáticamente. Déjalo vacío para elegirlos todos a mano.",
+        "data": {
+          "device_id": "Dispositivo ESPHome"
+        }
+      },
+      "sensors": {
+        "title": "Sensores",
+        "description": "Se han encontrado {detected} sensores. Solo son obligatorios el consumo eléctrico y la producción térmica. Un campo vacío simplemente no se envía.",
+        "data": {
+          "consumed_kwh": "Consumo eléctrico (kWh total)",
+          "outdoor_temp": "Temperatura exterior (opcional)",
+          "indoor_temp": "Temperatura interior (opcional)",
+          "outdoor_humidity": "Humedad exterior (opcional)"
+        },
+        "data_description": {
+          "consumed_kwh": "Contador de por vida que nunca vuelve a 0. Por defecto el contador de la propia máquina. Si tienes un contador externo (Shelly, Wibeee...) elígelo, es más preciso.",
+          "outdoor_temp": "Por defecto la sonda de la máquina. Puedes elegir tu propio termómetro exterior.",
+          "indoor_temp": "Un termómetro de la casa. La máquina no lo tiene.",
+          "outdoor_humidity": "De una estación meteorológica o sonda exterior. La máquina no la tiene."
+        },
+        "sections": {
+          "advanced": {
+            "name": "Avanzado: sensores detectados de la máquina",
+            "description": "Encontrados automáticamente. Cámbialos solo si sabes lo que haces.",
+            "data": {
+              "produced_kwh": "Producción térmica (kWh total)",
+              "consumed_heating_kwh": "Calefacción: consumo (opcional)",
+              "produced_heating_kwh": "Calefacción: producción (opcional)",
+              "consumed_acs_kwh": "ACS: consumo (opcional)",
+              "produced_acs_kwh": "ACS: producción (opcional)",
+              "consumed_cooling_kwh": "Refrigeración: consumo (opcional)",
+              "produced_cooling_kwh": "Refrigeración: producción (opcional)",
+              "compressor_hours": "Horas de compresor (opcional)",
+              "defrost_source": "Señal de desescarche (cuenta los desescarches) (opcional)",
+              "compressor_source": "Señal de compresor en marcha (cuenta los arranques) (opcional)"
+            },
+            "data_description": {
+              "defrost_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Defrost Cycles Total.",
+              "compressor_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Compressor Starts Total."
+            }
+          }
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Esta máquina ya está configurada."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sensores",
+        "description": "Solo son obligatorios el consumo eléctrico y la producción térmica. Un campo vacío simplemente no se envía.",
+        "data": {
+          "consumed_kwh": "Consumo eléctrico (kWh total)",
+          "outdoor_temp": "Temperatura exterior (opcional)",
+          "indoor_temp": "Temperatura interior (opcional)",
+          "outdoor_humidity": "Humedad exterior (opcional)"
+        },
+        "data_description": {
+          "consumed_kwh": "Contador de por vida que nunca vuelve a 0. Por defecto el contador de la propia máquina. Si tienes un contador externo (Shelly, Wibeee...) elígelo, es más preciso.",
+          "outdoor_temp": "Por defecto la sonda de la máquina. Puedes elegir tu propio termómetro exterior.",
+          "indoor_temp": "Un termómetro de la casa. La máquina no lo tiene.",
+          "outdoor_humidity": "De una estación meteorológica o sonda exterior. La máquina no la tiene."
+        },
+        "sections": {
+          "advanced": {
+            "name": "Avanzado: sensores detectados de la máquina",
+            "description": "Encontrados automáticamente. Cámbialos solo si sabes lo que haces.",
+            "data": {
+              "produced_kwh": "Producción térmica (kWh total)",
+              "consumed_heating_kwh": "Calefacción: consumo (opcional)",
+              "produced_heating_kwh": "Calefacción: producción (opcional)",
+              "consumed_acs_kwh": "ACS: consumo (opcional)",
+              "produced_acs_kwh": "ACS: producción (opcional)",
+              "consumed_cooling_kwh": "Refrigeración: consumo (opcional)",
+              "produced_cooling_kwh": "Refrigeración: producción (opcional)",
+              "compressor_hours": "Horas de compresor (opcional)",
+              "defrost_source": "Señal de desescarche (cuenta los desescarches) (opcional)",
+              "compressor_source": "Señal de compresor en marcha (cuenta los arranques) (opcional)",
+              "api_key": "API Key",
+              "minute": "Minuto asignado"
+            },
+            "data_description": {
+              "defrost_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Defrost Cycles Total.",
+              "compressor_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Compressor Starts Total.",
+              "api_key": "La de tu panel en la web.",
+              "minute": "El minuto que la web asignó a tu máquina (paso 3). No lo cambies salvo que lo cambie la web."
+            }
+          }
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "push_status": {
+        "state": {
+          "ok": "OK",
+          "skipped": "Omitido (sensor sin valor)",
+          "rate_limited": "Rechazado: más de 1 por hora",
+          "auth_error": "Rechazado: API Key no válida",
+          "error": "Error"
+        }
+      }
+    }
+  }
+}

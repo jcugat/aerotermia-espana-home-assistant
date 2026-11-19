@@ -1,0 +1,127 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Aerotermia España",
+        "description": "First register the machine on https://aerotermiaespana.sytes.net (step 1 of the panel, with the counter type set to Total). Then copy here the API key, the machine ID (#) and the assigned minute.",
+        "data": {
+          "api_key": "API Key",
+          "installation_id": "Machine ID",
+          "minute": "Assigned minute"
+        },
+        "data_description": {
+          "api_key": "From your panel on the web.",
+          "installation_id": "The number after # in the panel, e.g. 24.",
+          "minute": "The minute the web assigned to your machine (step 3). Do not change it unless the web does."
+        }
+      },
+      "device": {
+        "title": "Heat pump",
+        "description": "Pick the ESPHome device of your heat pump (Midea-heat-pump-ESPHome firmware) to find its sensors automatically. Leave it empty to pick every sensor by hand.",
+        "data": {
+          "device_id": "ESPHome device"
+        }
+      },
+      "sensors": {
+        "title": "Sensors",
+        "description": "{detected} sensors were found. Only the electricity consumed and the heat produced are required. An empty field is simply not sent.",
+        "data": {
+          "consumed_kwh": "Electricity consumed (total kWh)",
+          "outdoor_temp": "Outdoor temperature (optional)",
+          "indoor_temp": "Indoor temperature (optional)",
+          "outdoor_humidity": "Outdoor humidity (optional)"
+        },
+        "data_description": {
+          "consumed_kwh": "Lifetime counter that never resets. Detected: the machine's own meter. Pick an external meter (Shelly, Wibeee...) if you have one, it is more accurate.",
+          "outdoor_temp": "Detected from the machine. Pick your own outdoor thermometer if you prefer.",
+          "indoor_temp": "A room thermometer. The machine does not have one.",
+          "outdoor_humidity": "From a weather station or outdoor probe. The machine does not have one."
+        },
+        "sections": {
+          "advanced": {
+            "name": "Advanced: sensors detected from the machine",
+            "description": "Found automatically. Only change them if you know what you are doing.",
+            "data": {
+              "produced_kwh": "Heat produced (total kWh)",
+              "consumed_heating_kwh": "Heating: consumed (optional)",
+              "produced_heating_kwh": "Heating: produced (optional)",
+              "consumed_acs_kwh": "Hot water: consumed (optional)",
+              "produced_acs_kwh": "Hot water: produced (optional)",
+              "consumed_cooling_kwh": "Cooling: consumed (optional)",
+              "produced_cooling_kwh": "Cooling: produced (optional)",
+              "compressor_hours": "Compressor operating hours (optional)",
+              "defrost_source": "Defrost signal (counts defrost cycles) (optional)",
+              "compressor_source": "Compressor running signal (counts starts) (optional)"
+            },
+            "data_description": {
+              "defrost_source": "The integration counts every off to on change in its own Defrost Cycles Total sensor.",
+              "compressor_source": "The integration counts every off to on change in its own Compressor Starts Total sensor."
+            }
+          }
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This machine is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Sensors",
+        "description": "Only the electricity consumed and the heat produced are required. An empty field is simply not sent.",
+        "data": {
+          "consumed_kwh": "Electricity consumed (total kWh)",
+          "outdoor_temp": "Outdoor temperature (optional)",
+          "indoor_temp": "Indoor temperature (optional)",
+          "outdoor_humidity": "Outdoor humidity (optional)"
+        },
+        "data_description": {
+          "consumed_kwh": "Lifetime counter that never resets. Detected: the machine's own meter. Pick an external meter (Shelly, Wibeee...) if you have one, it is more accurate.",
+          "outdoor_temp": "Detected from the machine. Pick your own outdoor thermometer if you prefer.",
+          "indoor_temp": "A room thermometer. The machine does not have one.",
+          "outdoor_humidity": "From a weather station or outdoor probe. The machine does not have one."
+        },
+        "sections": {
+          "advanced": {
+            "name": "Advanced: sensors detected from the machine",
+            "description": "Found automatically. Only change them if you know what you are doing.",
+            "data": {
+              "produced_kwh": "Heat produced (total kWh)",
+              "consumed_heating_kwh": "Heating: consumed (optional)",
+              "produced_heating_kwh": "Heating: produced (optional)",
+              "consumed_acs_kwh": "Hot water: consumed (optional)",
+              "produced_acs_kwh": "Hot water: produced (optional)",
+              "consumed_cooling_kwh": "Cooling: consumed (optional)",
+              "produced_cooling_kwh": "Cooling: produced (optional)",
+              "compressor_hours": "Compressor operating hours (optional)",
+              "defrost_source": "Defrost signal (counts defrost cycles) (optional)",
+              "compressor_source": "Compressor running signal (counts starts) (optional)",
+              "api_key": "API Key",
+              "minute": "Assigned minute"
+            },
+            "data_description": {
+              "defrost_source": "The integration counts every off to on change in its own Defrost Cycles Total sensor.",
+              "compressor_source": "The integration counts every off to on change in its own Compressor Starts Total sensor.",
+              "api_key": "From your panel on the web.",
+              "minute": "The minute the web assigned to your machine (step 3). Do not change it unless the web does."
+            }
+          }
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "push_status": {
+        "state": {
+          "ok": "OK",
+          "skipped": "Skipped (sensor without value)",
+          "rate_limited": "Rejected: more than 1 per hour",
+          "auth_error": "Rejected: invalid API key",
+          "error": "Error"
+        }
+      }
+    }
+  }
+}

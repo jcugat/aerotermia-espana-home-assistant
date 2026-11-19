@@ -1,0 +1,12 @@
+{
+  "domain": "aerotermia_espana",
+  "name": "Aerotermia España",
+  "codeowners": ["@jcugat"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/jcugat/aerotermia-espana-home-assistant",
+  "integration_type": "service",
+  "iot_class": "cloud_push",
+  "requirements": [],
+  "version": "0.1.0"
+}
