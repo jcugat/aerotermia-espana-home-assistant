@@ -7,7 +7,6 @@ DASHBOARD_URL = "https://aerotermiaespana.sytes.net/dashboard?inst_id={}"
 CONF_INSTALLATION_ID = "installation_id"
 CONF_MINUTE = "minute"
 CONF_DEVICE_ID = "device_id"
-DEFAULT_MINUTE = 5
 
 # Payload fields, named as the web's push API expects them
 CONSUMED = "consumed_kwh"

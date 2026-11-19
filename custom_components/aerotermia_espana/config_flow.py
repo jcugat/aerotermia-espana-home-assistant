@@ -23,7 +23,6 @@ from .const import (
     CONSUMED_ACS,
     CONSUMED_COOLING,
     CONSUMED_HEATING,
-    DEFAULT_MINUTE,
     DEFROST_SOURCE,
     DOMAIN,
     ESPHOME_NAMES,
@@ -95,7 +94,7 @@ def sensors_schema(values: dict, with_connection: bool = False) -> vol.Schema:
     advanced = _fields(ADVANCED_FIELDS, values)
     if with_connection:
         advanced |= _fields({CONF_API_KEY: _PASSWORD}, values)
-        advanced[vol.Required(CONF_MINUTE, default=values.get(CONF_MINUTE, DEFAULT_MINUTE))] = _MINUTE
+        advanced[vol.Required(CONF_MINUTE, default=values[CONF_MINUTE])] = _MINUTE
     schema = _fields(BASIC_FIELDS, values)
     schema[vol.Required(ADVANCED)] = section(
         vol.Schema(advanced), {"collapsed": bool(values.get(PRODUCED))}
@@ -141,7 +140,7 @@ class AerotermiaConfigFlow(ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_INSTALLATION_ID): sel.NumberSelector(
                         sel.NumberSelectorConfig(min=1, mode=sel.NumberSelectorMode.BOX)
                     ),
-                    vol.Required(CONF_MINUTE, default=DEFAULT_MINUTE): _MINUTE,
+                    vol.Required(CONF_MINUTE): _MINUTE,
                 }
             ),
         )
