@@ -16,9 +16,10 @@ from homeassistant.helpers.event import async_track_state_change_event
 from . import Pusher
 from .const import COMPRESSOR_STARTS, COUNTER_SOURCES, DEFROST_CYCLES, SIGNAL_STATUS
 
+# The slug is the translation key and the entity_id suffix
 COUNTERS = {
-    DEFROST_CYCLES: ("Defrost Cycles Total", "defrost_cycles_total", "mdi:snowflake-melt"),
-    COMPRESSOR_STARTS: ("Compressor Starts Total", "compressor_starts_total", "mdi:counter"),
+    DEFROST_CYCLES: ("defrost_cycles_total", "mdi:snowflake-melt"),
+    COMPRESSOR_STARTS: ("compressor_starts_total", "mdi:counter"),
 }
 STATUSES = ["ok", "skipped", "rate_limited", "auth_error", "error"]
 
@@ -40,11 +41,11 @@ class CounterSensor(RestoreSensor):
     _attr_native_value = 0
 
     def __init__(self, pusher: Pusher, field: str, source: str) -> None:
-        name, slug, icon = COUNTERS[field]
+        slug, icon = COUNTERS[field]
         self._pusher = pusher
         self._field = field
         self._source = source
-        self._attr_name = name
+        self._attr_translation_key = slug
         self._attr_icon = icon
         self._attr_unique_id = f"{pusher.installation_id}_{slug}"
         self._attr_device_info = pusher.device_info
@@ -76,7 +77,6 @@ class PushStatusSensor(SensorEntity):
     """Result of the last push, with the request and response as attributes."""
 
     _attr_has_entity_name = True
-    _attr_name = "Push Status"
     _attr_icon = "mdi:cloud-upload-outline"
     _attr_device_class = SensorDeviceClass.ENUM
     _attr_options = STATUSES

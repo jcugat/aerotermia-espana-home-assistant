@@ -16,8 +16,8 @@
         }
       },
       "device": {
-        "title": "Bomba de calor",
-        "description": "Elige el dispositivo ESPHome de tu bomba de calor (firmware Midea-heat-pump-ESPHome) para encontrar sus sensores automáticamente. Déjalo vacío para elegirlos todos a mano.",
+        "title": "Aerotermia",
+        "description": "Elige el dispositivo ESPHome de tu aerotermia (firmware Midea-heat-pump-ESPHome) para encontrar sus sensores automáticamente. Déjalo vacío para elegirlos todos a mano.",
         "data": {
           "device_id": "Dispositivo ESPHome"
         }
@@ -120,7 +120,19 @@
           "rate_limited": "Rechazado: más de 1 por hora",
           "auth_error": "Rechazado: API Key no válida",
           "error": "Error"
-        }
+        },
+        "name": "Estado del envío"
+      },
+      "defrost_cycles_total": {
+        "name": "Desescarches totales"
+      },
+      "compressor_starts_total": {
+        "name": "Arranques totales del compresor"
+      }
+    },
+    "button": {
+      "push_now": {
+        "name": "Enviar ahora"
       }
     }
   }

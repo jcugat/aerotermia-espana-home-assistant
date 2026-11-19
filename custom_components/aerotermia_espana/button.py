@@ -16,7 +16,7 @@ class PushNowButton(ButtonEntity):
     """Push now. Outside the web's debug mode the server answers 429."""
 
     _attr_has_entity_name = True
-    _attr_name = "Push Now"
+    _attr_translation_key = "push_now"
     _attr_icon = "mdi:cloud-upload"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 

@@ -120,7 +120,19 @@
           "rate_limited": "Rejected: more than 1 per hour",
           "auth_error": "Rejected: invalid API key",
           "error": "Error"
-        }
+        },
+        "name": "Push Status"
+      },
+      "defrost_cycles_total": {
+        "name": "Defrost Cycles Total"
+      },
+      "compressor_starts_total": {
+        "name": "Compressor Starts Total"
+      }
+    },
+    "button": {
+      "push_now": {
+        "name": "Push Now"
       }
     }
   }
