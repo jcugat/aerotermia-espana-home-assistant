@@ -43,7 +43,10 @@ Mira qué versión de Home Assistant tienes en **Ajustes → Información** y si
 
 Desde la 2026.11, HACS viene dentro de Home Assistant con el nombre **Marketplace**. No hay que instalar nada antes.
 
-1. Pulsa el botón azul de arriba (**Open your Home Assistant instance**) y confirma tu instancia.
+1. Pulsa este botón y confirma tu instancia:
+
+   [![Abrir en Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jcugat&repository=aerotermia-espana-home-assistant&category=integration)
+
    Si prefieres hacerlo a mano: **Ajustes → Marketplace**, arriba a la derecha **Add from link**, pega `https://github.com/jcugat/aerotermia-espana-home-assistant` y pulsa **Add**.
 2. La primera vez, Home Assistant te pedirá conectar una cuenta de GitHub (solo lee información pública). Pulsa **Continue**, abre el enlace, escribe el código que te muestra y vuelve a Home Assistant.
 3. Si es la primera vez que usas el Marketplace, acepta el aviso de que el contenido lo publica la comunidad.
@@ -54,7 +57,10 @@ Desde la 2026.11, HACS viene dentro de Home Assistant con el nombre **Marketplac
 
 Necesitas tener [HACS](https://www.hacs.xyz/) instalado.
 
-1. Pulsa el botón azul de arriba (**Open your Home Assistant instance**) y confirma tu instancia.
+1. Pulsa este botón y confirma tu instancia:
+
+   [![Abrir en Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jcugat&repository=aerotermia-espana-home-assistant&category=integration)
+
    Si prefieres hacerlo a mano: abre **HACS**, pulsa los tres puntos de arriba a la derecha, elige **Custom repositories**, pega `https://github.com/jcugat/aerotermia-espana-home-assistant`, elige el tipo **Integration** y pulsa **Add**.
 2. Abre **Aerotermia España** y pulsa **Download** abajo a la derecha.
 3. Reinicia Home Assistant.
