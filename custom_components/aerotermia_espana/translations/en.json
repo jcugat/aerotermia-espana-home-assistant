@@ -54,8 +54,8 @@
               "compressor_source": "Señal de compresor en marcha (cuenta los arranques) (opcional)"
             },
             "data_description": {
-              "defrost_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Defrost Cycles Total.",
-              "compressor_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Compressor Starts Total."
+              "defrost_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Desescarches totales.",
+              "compressor_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Arranques totales del compresor."
             }
           }
         }
@@ -101,8 +101,8 @@
               "minute": "Minuto asignado"
             },
             "data_description": {
-              "defrost_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Defrost Cycles Total.",
-              "compressor_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Compressor Starts Total.",
+              "defrost_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Desescarches totales.",
+              "compressor_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Arranques totales del compresor.",
               "api_key": "La de tu panel en la web.",
               "minute": "El minuto que la web asignó a tu máquina (paso 3). No lo cambies salvo que lo cambie la web."
             }
