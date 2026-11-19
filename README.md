@@ -24,7 +24,7 @@ La integración hace todo lo que antes había que montar a mano: el envío horar
 
 - Una cuenta en [aerotermiaespana.sytes.net](https://aerotermiaespana.sytes.net) con tu máquina dada de alta.
 - Home Assistant 2025.1 o posterior.
-- Tu aerotermia conectada a Home Assistant. Lo ideal es un ESP32 con el firmware Midea-heat-pump-ESPHome, pero también puedes elegir los sensores a mano.
+- Tu aerotermia conectada a Home Assistant. Lo ideal es un ESP32 con el firmware [Midea-heat-pump-ESPHome](https://github.com/jcugat/Midea-heat-pump-ESPHome), pero también puedes elegir los sensores a mano.
 
 ## 1. Da de alta la máquina en la web
 
@@ -72,7 +72,7 @@ Necesitas tener [HACS](https://www.hacs.xyz/) instalado.
 1. Ve a **Configuración → Dispositivos y servicios → Añadir integración** y busca **Aerotermia España**.
 2. Escribe la **API Key**, el **ID de la máquina** y el **minuto asignado** que apuntaste en la web.
 3. Elige el dispositivo ESPHome de tu aerotermia. La integración busca sus sensores y rellena el siguiente paso.
-   Si no usas el firmware Midea-heat-pump-ESPHome, déjalo vacío y elige los sensores a mano.
+   Si no usas el firmware [Midea-heat-pump-ESPHome](https://github.com/jcugat/Midea-heat-pump-ESPHome), déjalo vacío y elige los sensores a mano.
 4. Revisa los sensores:
    - Arriba salen el consumo eléctrico y los sensores que la máquina no tiene (temperatura interior y humedad exterior). Si tienes un contador externo como Shelly o Wibeee, elígelo para el consumo, porque es más preciso.
    - En **Avanzado** están el resto de sensores detectados. Normalmente no hay que tocarlos.
@@ -108,7 +108,7 @@ Los contadores de la integración empiezan en 0, no continúan desde los que tuv
 
 Esta versión envía a la web estos datos. Solo el consumo eléctrico y la producción térmica son obligatorios. Si un dato opcional no tiene sensor, no se envía.
 
-| Dato | Obligatorio | Sensor del firmware Midea-heat-pump-ESPHome |
+| Dato | Obligatorio | Sensor del firmware [Midea-heat-pump-ESPHome](https://github.com/jcugat/Midea-heat-pump-ESPHome) |
 |---|---|---|
 | Consumo eléctrico (kWh) | Sí | Electricity Consumption |
 | Producción térmica (kWh) | Sí | Power Output |
