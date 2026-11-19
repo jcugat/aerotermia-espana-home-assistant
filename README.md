@@ -37,7 +37,7 @@ La integración hace todo lo que antes había que montar a mano: el envío horar
 
 ## 2. Instala la integración
 
-Mira qué versión de Home Assistant tienes en **Ajustes → Información** y sigue los pasos que te tocan.
+Mira qué versión de Home Assistant tienes en **Configuración → Acerca de** y sigue los pasos que te tocan.
 
 ### Home Assistant 2026.11 o posterior (Marketplace)
 
@@ -47,11 +47,12 @@ Desde la 2026.11, HACS viene dentro de Home Assistant con el nombre **Marketplac
 
    [![Abrir en Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jcugat&repository=aerotermia-espana-home-assistant&category=integration)
 
-   Si prefieres hacerlo a mano: **Ajustes → Marketplace**, arriba a la derecha **Add from link**, pega `https://github.com/jcugat/aerotermia-espana-home-assistant` y pulsa **Add**.
-2. La primera vez, Home Assistant te pedirá conectar una cuenta de GitHub (solo lee información pública). Pulsa **Continue**, abre el enlace, escribe el código que te muestra y vuelve a Home Assistant.
-3. Si es la primera vez que usas el Marketplace, acepta el aviso de que el contenido lo publica la comunidad.
-4. Abre **Aerotermia España**, pulsa **Install**, revisa la versión y pulsa **Install** otra vez.
-5. Normalmente no hace falta reiniciar. Si Home Assistant lo pide en **Ajustes → Sistema → Reparaciones**, reinicia desde allí.
+   Si prefieres hacerlo a mano: **Configuración → Marketplace → Añadir desde enlace**, pega `https://github.com/jcugat/aerotermia-espana-home-assistant` en **Enlace de GitHub** y pulsa **Añadir**.
+2. La primera vez que abres el Marketplace sale el aviso **Antes de instalar desde el Marketplace**. Marca **Entiendo los riesgos y estoy de acuerdo.** y pulsa **Continuar**.
+3. Si aún no has conectado GitHub, Home Assistant te lo pedirá (solo lee información pública). Pulsa **Conectar GitHub**, abre el enlace, escribe el código que te muestra y vuelve a Home Assistant. Después pulsa otra vez el botón del paso 1.
+4. Si has usado el botón, en la ventana **Añadir repositorio personalizado** pulsa **Añadir**.
+5. Abre **Aerotermia España**, pulsa **Instalar**, revisa la versión y pulsa **Instalar** otra vez.
+6. Normalmente no hace falta reiniciar. Si sale el botón **Reiniciar Home Assistant**, púlsalo.
 
 ### Home Assistant 2026.10 o anterior (HACS)
 
@@ -61,13 +62,14 @@ Necesitas tener [HACS](https://www.hacs.xyz/) instalado.
 
    [![Abrir en Home Assistant](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=jcugat&repository=aerotermia-espana-home-assistant&category=integration)
 
-   Si prefieres hacerlo a mano: abre **HACS**, pulsa los tres puntos de arriba a la derecha, elige **Custom repositories**, pega `https://github.com/jcugat/aerotermia-espana-home-assistant`, elige el tipo **Integration** y pulsa **Add**.
-2. Abre **Aerotermia España** y pulsa **Download** abajo a la derecha.
-3. Reinicia Home Assistant.
+   Si prefieres hacerlo a mano: abre **HACS**, pulsa los tres puntos de arriba a la derecha y elige **Repositorios personalizados**. Pega `https://github.com/jcugat/aerotermia-espana-home-assistant` en **Repositorio**, elige el tipo **Integración** y pulsa **Añadir**.
+2. Si has usado el botón, en la ventana **Añadir repositorio personalizado** pulsa **Añadir**.
+3. En la página de **Aerotermia España**, pulsa **Descargar** abajo a la derecha y confirma la descarga.
+4. Reinicia Home Assistant.
 
 ## 3. Configúrala
 
-1. Ve a **Ajustes → Dispositivos y servicios → Añadir integración** y busca **Aerotermia España**.
+1. Ve a **Configuración → Dispositivos y servicios → Añadir integración** y busca **Aerotermia España**.
 2. Escribe la **API Key**, el **ID de la máquina** y el **minuto asignado** que apuntaste en la web.
 3. Elige el dispositivo ESPHome de tu aerotermia. La integración busca sus sensores y rellena el siguiente paso.
    Si no usas el firmware Midea-heat-pump-ESPHome, déjalo vacío y elige los sensores a mano.
