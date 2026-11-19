@@ -20,6 +20,16 @@
 
 La integración hace todo lo que antes había que montar a mano: el envío horario a la web, los contadores de desescarches y de arranques del compresor y la elección de sensores. Si tu máquina lleva el firmware [Midea-heat-pump-ESPHome](https://github.com/jcugat/Midea-heat-pump-ESPHome), encuentra sola todos los sensores.
 
+## Capturas
+
+El asistente de configuración: la conexión con la web, los sensores principales y la sección **Avanzado** con los sensores detectados de la máquina.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/jcugat/aerotermia-espana-home-assistant/main/docs/paso-conexion.png" alt="Paso de conexión con la API Key, el ID de la máquina y el minuto asignado" width="260" align="top">
+  <img src="https://raw.githubusercontent.com/jcugat/aerotermia-espana-home-assistant/main/docs/paso-sensores.png" alt="Paso de sensores con el consumo, las temperaturas y la humedad elegidos" width="260" align="top">
+  <img src="https://raw.githubusercontent.com/jcugat/aerotermia-espana-home-assistant/main/docs/paso-avanzado.png" alt="Sección Avanzado con los sensores detectados de la máquina" width="260" align="top">
+</p>
+
 ## Qué necesitas
 
 - Una cuenta en [aerotermiaespana.sytes.net](https://aerotermiaespana.sytes.net) con tu máquina dada de alta.
