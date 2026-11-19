@@ -169,7 +169,7 @@ class AerotermiaConfigFlow(ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             options = {k: self._options[k] for k in (CONF_API_KEY, CONF_MINUTE)} | flatten(user_input)
             return self.async_create_entry(
-                title=f"Aerotermia #{self._data[CONF_INSTALLATION_ID]}",
+                title=f"Aerotermia España #{self._data[CONF_INSTALLATION_ID]}",
                 data=self._data,
                 options=options,
             )

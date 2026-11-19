@@ -84,7 +84,7 @@ Si tienes varias máquinas, añade la integración una vez por cada una. Cada m�
 
 ## Comprobar que funciona
 
-Cada máquina tiene un dispositivo **Aerotermia #ID**. En su sensor **Estado del envío** verás el resultado del último envío:
+Cada máquina tiene un dispositivo **Aerotermia España #ID**. En su sensor **Estado del envío** verás el resultado del último envío:
 
 | Estado | Qué significa |
 |---|---|

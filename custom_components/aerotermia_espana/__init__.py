@@ -46,7 +46,7 @@ class Pusher:
         self.attributes: dict = {}
         self.device_info = DeviceInfo(
             identifiers={(DOMAIN, str(self.installation_id))},
-            name=f"Aerotermia #{self.installation_id}",
+            name=f"Aerotermia España #{self.installation_id}",
             manufacturer="Aerotermia España",
             entry_type=DeviceEntryType.SERVICE,
             configuration_url=DASHBOARD_URL.format(self.installation_id),
