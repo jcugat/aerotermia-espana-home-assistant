@@ -14,7 +14,7 @@ from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import async_track_state_change_event
 
 from . import Pusher
-from .const import COMPRESSOR_STARTS, COUNTER_SOURCES, DEFROST_CYCLES, SIGNAL_STATUS
+from .const import COMPRESSOR_STARTS, COUNTER_INITIAL, COUNTER_SOURCES, DEFROST_CYCLES, SIGNAL_STATUS
 
 # The slug is the translation key and the entity_id suffix
 COUNTERS = {
@@ -57,6 +57,9 @@ class CounterSensor(RestoreSensor):
         await super().async_added_to_hass()
         if (last := await self.async_get_last_sensor_data()) and last.native_value is not None:
             self._attr_native_value = int(last.native_value)
+        # The user's floor only raises the count, so it can never go down on the web
+        floor = self._pusher.entry.options.get(COUNTER_INITIAL[self._field], 0)
+        self._attr_native_value = max(self._attr_native_value, floor)
         self._pusher.counters[self._field] = self._attr_native_value
         self.async_on_remove(
             async_track_state_change_event(self.hass, self._source, self._on_source_change)

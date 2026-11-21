@@ -8,6 +8,11 @@ CONF_INSTALLATION_ID = "installation_id"
 CONF_MINUTE = "minute"
 CONF_DEVICE_ID = "device_id"
 
+# How the heat pump reaches Home Assistant. Fixed at setup.
+CONF_MODEL = "model"
+MODEL_MIDEA_ESPHOME = "midea_esphome"
+MODEL_OTHER = "other"
+
 # Payload fields, named as the web's push API expects them
 CONSUMED = "consumed_kwh"
 PRODUCED = "produced_kwh"
@@ -23,25 +28,29 @@ INDOOR_TEMP = "indoor_temp"
 OUTDOOR_HUMIDITY = "outdoor_humidity"
 DEFROST_CYCLES = "defrost_cycles"
 COMPRESSOR_STARTS = "compressor_starts"
+TARGET_FLOW_TEMP = "target_flow_temp"
 
 # Binary sensors the integration counts to produce the two counter fields
 DEFROST_SOURCE = "defrost_source"
 COMPRESSOR_SOURCE = "compressor_source"
 COUNTER_SOURCES = {DEFROST_CYCLES: DEFROST_SOURCE, COMPRESSOR_STARTS: COMPRESSOR_SOURCE}
+# Floor for each counter, so a reinstall can carry on from the old totals and never go down on the web
+COUNTER_INITIAL = {DEFROST_CYCLES: "defrost_cycles_initial", COMPRESSOR_STARTS: "compressor_starts_initial"}
 
 SENSOR_FIELDS = (
     CONSUMED,
     PRODUCED,
     CONSUMED_HEATING,
     PRODUCED_HEATING,
-    CONSUMED_ACS,
-    PRODUCED_ACS,
     CONSUMED_COOLING,
     PRODUCED_COOLING,
+    CONSUMED_ACS,
+    PRODUCED_ACS,
     COMPRESSOR_HOURS,
     OUTDOOR_TEMP,
     INDOOR_TEMP,
     OUTDOOR_HUMIDITY,
+    TARGET_FLOW_TEMP,
 )
 
 # Field -> (domain, entity name in the Midea-heat-pump-ESPHome firmware).

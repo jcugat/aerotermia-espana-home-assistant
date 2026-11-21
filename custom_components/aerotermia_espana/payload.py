@@ -32,6 +32,12 @@ def to_number(state: str | None) -> float | None:
     return value if math.isfinite(value) else None
 
 
+def to_count(state: str | None) -> int | None:
+    """Return a counter state as an int, or None when it has no value."""
+    value = to_number(state)
+    return None if value is None else int(value)
+
+
 def build_payload(
     installation_id: int,
     local_datetime: str,

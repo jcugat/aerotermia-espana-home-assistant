@@ -47,6 +47,11 @@ def test_nan_is_null():
     assert payload.to_number("nan") is None
 
 
+def test_counter_from_entity():
+    assert payload.to_count("517.0") == 517
+    assert payload.to_count("unavailable") is None
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):

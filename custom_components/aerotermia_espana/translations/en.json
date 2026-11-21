@@ -15,47 +15,116 @@
           "minute": "El minuto que la web asignó a tu máquina (paso 3). No lo cambies salvo que lo cambie la web."
         }
       },
+      "model": {
+        "title": "Tipo de aerotermia",
+        "description": "¿Qué aerotermia tienes? Según cuál elijas, los sensores se encuentran solos o los eliges a mano.",
+        "data": {
+          "model": "Aerotermia"
+        }
+      },
       "device": {
         "title": "Aerotermia",
-        "description": "Elige el dispositivo ESPHome de tu aerotermia (firmware Midea-heat-pump-ESPHome) para encontrar sus sensores automáticamente. Déjalo vacío para elegirlos todos a mano.",
+        "description": "Elige el dispositivo ESPHome de tu aerotermia (firmware Midea-heat-pump-ESPHome) para encontrar sus sensores automáticamente.",
         "data": {
           "device_id": "Dispositivo ESPHome"
         }
       },
       "sensors": {
         "title": "Sensores",
-        "description": "Se han encontrado {detected} sensores. Solo son obligatorios el consumo eléctrico y la producción térmica. Un campo vacío simplemente no se envía.",
+        "description": "Se han encontrado {detected} sensores. Únicamente son obligatorios el Consumo Eléctrico y la Producción Térmica general. En todos los demás campos, dejar el campo vacío equivale exactamente a no tenerlo configurado. La plataforma espera sensores con contador continuo acumulativo de por vida que nunca vuelvan a cero (ej: medidores Shelly, Wibeee o Modbus). Todos los sensores de energía deben medir en kWh.",
         "data": {
-          "consumed_kwh": "Consumo eléctrico (kWh total)",
-          "outdoor_temp": "Temperatura exterior (opcional)",
-          "indoor_temp": "Temperatura interior (opcional)",
-          "outdoor_humidity": "Humedad exterior (opcional)"
+          "consumed_kwh": "Sensor de Energía Eléctrica Consumida (kWh, obligatorio)",
+          "outdoor_temp": "Temperatura Exterior (°C, opcional)",
+          "indoor_temp": "Temperatura Interior (°C, opcional)",
+          "outdoor_humidity": "Humedad Exterior (%, opcional)"
         },
         "data_description": {
-          "consumed_kwh": "Contador de por vida que nunca vuelve a 0. Por defecto el contador de la propia máquina. Si tienes un contador externo (Shelly, Wibeee...) elígelo, es más preciso.",
-          "outdoor_temp": "Por defecto la sonda de la máquina. Puedes elegir tu propio termómetro exterior.",
-          "indoor_temp": "Un termómetro de la casa. La máquina no lo tiene.",
-          "outdoor_humidity": "De una estación meteorológica o sonda exterior. La máquina no la tiene."
+          "consumed_kwh": "Contador de energía eléctrica total acumulada continua (Shelly, Wibeee, Modbus, contador general de la máquina que no vuelve a 0). Por defecto el contador de la propia máquina. Si tienes un contador externo (Shelly, Wibeee...) elígelo, es más preciso.",
+          "outdoor_temp": "Sonda de temperatura exterior de la propia máquina o de una estación meteorológica en Home Assistant. Fundamental para correlacionar el COP con el clima. Por defecto la sonda de la máquina. Puedes elegir tu propio termómetro exterior. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "indoor_temp": "Termostato principal o sensor de temperatura de la estancia de referencia (ej: salón). Muestra el confort térmico interior mantenido. La máquina no lo tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "outdoor_humidity": "Sensor de humedad relativa exterior (%) de una estación meteorológica o sonda exterior. Ayuda a entender las condiciones ambientales y el punto de rocío. La máquina no la tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado)."
         },
         "sections": {
           "advanced": {
             "name": "Avanzado: sensores detectados de la máquina",
             "description": "Encontrados automáticamente. Cámbialos solo si sabes lo que haces.",
             "data": {
-              "produced_kwh": "Producción térmica (kWh total)",
-              "consumed_heating_kwh": "Calefacción: consumo (opcional)",
-              "produced_heating_kwh": "Calefacción: producción (opcional)",
-              "consumed_acs_kwh": "ACS: consumo (opcional)",
-              "produced_acs_kwh": "ACS: producción (opcional)",
-              "consumed_cooling_kwh": "Refrigeración: consumo (opcional)",
-              "produced_cooling_kwh": "Refrigeración: producción (opcional)",
-              "compressor_hours": "Horas de compresor (opcional)",
-              "defrost_source": "Señal de desescarche (cuenta los desescarches) (opcional)",
-              "compressor_source": "Señal de compresor en marcha (cuenta los arranques) (opcional)"
+              "produced_kwh": "Sensor de Energía Térmica Producida (kWh, obligatorio)",
+              "consumed_heating_kwh": "Consumo Eléctrico Calefacción (kWh, opcional)",
+              "produced_heating_kwh": "Producción Térmica Calefacción (kWh, opcional)",
+              "consumed_cooling_kwh": "Consumo Eléctrico Refrigeración (kWh, opcional)",
+              "produced_cooling_kwh": "Producción Térmica Frío (Refrigeración) (kWh, opcional)",
+              "consumed_acs_kwh": "Consumo Eléctrico ACS (kWh, opcional)",
+              "produced_acs_kwh": "Producción Térmica ACS (kWh, opcional)",
+              "compressor_hours": "Horas de Compresor (horas, opcional)",
+              "defrost_source": "Contador de Desescarches (Defrost): señal de desescarche (opcional)",
+              "compressor_source": "Arranques de Compresor (Starts): señal de compresor en marcha (opcional)",
+              "target_flow_temp": "Tª Objetivo / Consigna Impulsión (Target / Nominal) (°C, opcional)",
+              "defrost_cycles_initial": "Desescarches totales: valor inicial (opcional)",
+              "compressor_starts_initial": "Arranques totales del compresor: valor inicial (opcional)"
             },
             "data_description": {
+              "produced_kwh": "Contador de calor o energía térmica total acumulada continua entregada por la máquina (rendimiento de calor eBUS, Aquarea, Daikin que no vuelve a 0).",
+              "consumed_heating_kwh": "Electricidad consumida exclusivamente en modo calefacción (sensor total acumulado).",
+              "produced_heating_kwh": "Calor útil generado para calentar la vivienda (sensor total acumulado).",
+              "consumed_cooling_kwh": "Electricidad consumida en modo frío / suelo refrescante / fancoils (sensor total acumulado).",
+              "produced_cooling_kwh": "Frío útil entregado a la vivienda en refrigeración (sensor total acumulado).",
+              "consumed_acs_kwh": "Electricidad consumida para calentar el agua sanitaria (sensor total acumulado).",
+              "produced_acs_kwh": "Calor útil entregado al acumulador / interacumulador de ACS (sensor total acumulado).",
+              "compressor_hours": "Contador acumulado de horas de funcionamiento del compresor de la máquina. Permite estimar horas diarias de encendido y modulación media. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
               "defrost_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Desescarches totales.",
-              "compressor_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Arranques totales del compresor."
+              "compressor_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Arranques totales del compresor.",
+              "target_flow_temp": "No es la impulsión (Ida real), es el objetivo actual (Target / Nominal) que la máquina intenta alcanzar según su curva climática o consigna fijada (en calefacción o refrigeración). Si la máquina está apagada o en standby sin demanda, el sensor debe devolver 0 o null. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+              "defrost_cycles_initial": "Si reinstalas la integración, pon el último valor que tenía para que no baje en la web. El contador empieza en este valor si no tenía uno más alto.",
+              "compressor_starts_initial": "Si reinstalas la integración, pon el último valor que tenía para que no baje en la web. El contador empieza en este valor si no tenía uno más alto."
+            }
+          }
+        }
+      },
+      "manual": {
+        "title": "Sensores",
+        "description": "Elige cada sensor a mano. Únicamente son obligatorios el Consumo Eléctrico y la Producción Térmica general. En todos los demás campos, dejar el campo vacío equivale exactamente a no tenerlo configurado. La plataforma espera sensores con contador continuo acumulativo de por vida que nunca vuelvan a cero (ej: medidores Shelly, Wibeee o Modbus). Todos los sensores de energía deben medir en kWh.",
+        "data": {
+          "consumed_kwh": "Sensor de Energía Eléctrica Consumida (kWh, obligatorio)",
+          "produced_kwh": "Sensor de Energía Térmica Producida (kWh, obligatorio)",
+          "compressor_hours": "Horas de Compresor (horas, opcional)",
+          "outdoor_temp": "Temperatura Exterior (°C, opcional)",
+          "indoor_temp": "Temperatura Interior (°C, opcional)",
+          "outdoor_humidity": "Humedad Exterior (%, opcional)",
+          "defrost_cycles": "Contador de Desescarches (Defrost) (ciclos, opcional)",
+          "compressor_starts": "Arranques de Compresor (Starts) (starts, opcional)",
+          "target_flow_temp": "Tª Objetivo / Consigna Impulsión (Target / Nominal) (°C, opcional)"
+        },
+        "data_description": {
+          "consumed_kwh": "Contador de energía eléctrica total acumulada continua (Shelly, Wibeee, Modbus, contador general de la máquina que no vuelve a 0).",
+          "produced_kwh": "Contador de calor o energía térmica total acumulada continua entregada por la máquina (rendimiento de calor eBUS, Aquarea, Daikin que no vuelve a 0).",
+          "compressor_hours": "Contador acumulado de horas de funcionamiento del compresor de la máquina. Permite estimar horas diarias de encendido y modulación media. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "outdoor_temp": "Sonda de temperatura exterior de la propia máquina o de una estación meteorológica en Home Assistant. Fundamental para correlacionar el COP con el clima. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "indoor_temp": "Termostato principal o sensor de temperatura de la estancia de referencia (ej: salón). Muestra el confort térmico interior mantenido. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "outdoor_humidity": "Sensor de humedad relativa exterior (%) de una estación meteorológica o sonda exterior. Ayuda a entender las condiciones ambientales y el punto de rocío. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "defrost_cycles": "Contador de ciclos de desescarche de la bomba de calor (contador total acumulado de por vida). Permite monitorizar cuántas veces invierte ciclo para descongelar la batería exterior. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "compressor_starts": "Contador de arranques / ciclos ON de encendido del compresor (contador total acumulado de por vida). Permite evaluar el cycling y sobre-dimensionamiento de la máquina. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "target_flow_temp": "No es la impulsión (Ida real), es el objetivo actual (Target / Nominal) que la máquina intenta alcanzar según su curva climática o consigna fijada (en calefacción o refrigeración). Si la máquina está apagada o en standby sin demanda, el sensor debe devolver 0 o null. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado)."
+        },
+        "sections": {
+          "breakdown": {
+            "name": "Desglose por Servicio: Calefacción, Refrigeración y ACS (opcional)",
+            "description": "Al indicar estos sensores por separado, la plataforma calculará automáticamente el COP de Calefacción, el COP de Refrigeración (❄️) y el COP de ACS (💧) independientes, evitando mezclar rendimientos entre distintos modos térmicos. Si no dispones de ellos, déjalos en blanco.",
+            "data": {
+              "consumed_heating_kwh": "Consumo Eléctrico Calefacción (kWh, opcional)",
+              "produced_heating_kwh": "Producción Térmica Calefacción (kWh, opcional)",
+              "consumed_cooling_kwh": "Consumo Eléctrico Refrigeración (kWh, opcional)",
+              "produced_cooling_kwh": "Producción Térmica Frío (Refrigeración) (kWh, opcional)",
+              "consumed_acs_kwh": "Consumo Eléctrico ACS (kWh, opcional)",
+              "produced_acs_kwh": "Producción Térmica ACS (kWh, opcional)"
+            },
+            "data_description": {
+              "consumed_heating_kwh": "Electricidad consumida exclusivamente en modo calefacción (sensor total acumulado).",
+              "produced_heating_kwh": "Calor útil generado para calentar la vivienda (sensor total acumulado).",
+              "consumed_cooling_kwh": "Electricidad consumida en modo frío / suelo refrescante / fancoils (sensor total acumulado).",
+              "produced_cooling_kwh": "Frío útil entregado a la vivienda en refrigeración (sensor total acumulado).",
+              "consumed_acs_kwh": "Electricidad consumida para calentar el agua sanitaria (sensor total acumulado).",
+              "produced_acs_kwh": "Calor útil entregado al acumulador / interacumulador de ACS (sensor total acumulado)."
             }
           }
         }
@@ -63,7 +132,8 @@
     },
     "error": {
       "installation_id_missing": "Escribe el ID de la máquina, el número tras # en tu panel de la web.",
-      "minute_missing": "Escribe el minuto asignado, lo tienes en el paso 3 de tu panel de la web."
+      "minute_missing": "Escribe el minuto asignado, lo tienes en el paso 3 de tu panel de la web.",
+      "model_missing": "Elige qué aerotermia tienes."
     },
     "abort": {
       "already_configured": "Esta máquina ya está configurada."
@@ -73,40 +143,113 @@
     "step": {
       "init": {
         "title": "Sensores",
-        "description": "Solo son obligatorios el consumo eléctrico y la producción térmica. Un campo vacío simplemente no se envía.",
+        "description": "Únicamente son obligatorios el Consumo Eléctrico y la Producción Térmica general. En todos los demás campos, dejar el campo vacío equivale exactamente a no tenerlo configurado. La plataforma espera sensores con contador continuo acumulativo de por vida que nunca vuelvan a cero (ej: medidores Shelly, Wibeee o Modbus). Todos los sensores de energía deben medir en kWh.",
         "data": {
-          "consumed_kwh": "Consumo eléctrico (kWh total)",
-          "outdoor_temp": "Temperatura exterior (opcional)",
-          "indoor_temp": "Temperatura interior (opcional)",
-          "outdoor_humidity": "Humedad exterior (opcional)"
+          "consumed_kwh": "Sensor de Energía Eléctrica Consumida (kWh, obligatorio)",
+          "outdoor_temp": "Temperatura Exterior (°C, opcional)",
+          "indoor_temp": "Temperatura Interior (°C, opcional)",
+          "outdoor_humidity": "Humedad Exterior (%, opcional)"
         },
         "data_description": {
-          "consumed_kwh": "Contador de por vida que nunca vuelve a 0. Por defecto el contador de la propia máquina. Si tienes un contador externo (Shelly, Wibeee...) elígelo, es más preciso.",
-          "outdoor_temp": "Por defecto la sonda de la máquina. Puedes elegir tu propio termómetro exterior.",
-          "indoor_temp": "Un termómetro de la casa. La máquina no lo tiene.",
-          "outdoor_humidity": "De una estación meteorológica o sonda exterior. La máquina no la tiene."
+          "consumed_kwh": "Contador de energía eléctrica total acumulada continua (Shelly, Wibeee, Modbus, contador general de la máquina que no vuelve a 0). Por defecto el contador de la propia máquina. Si tienes un contador externo (Shelly, Wibeee...) elígelo, es más preciso.",
+          "outdoor_temp": "Sonda de temperatura exterior de la propia máquina o de una estación meteorológica en Home Assistant. Fundamental para correlacionar el COP con el clima. Por defecto la sonda de la máquina. Puedes elegir tu propio termómetro exterior. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "indoor_temp": "Termostato principal o sensor de temperatura de la estancia de referencia (ej: salón). Muestra el confort térmico interior mantenido. La máquina no lo tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "outdoor_humidity": "Sensor de humedad relativa exterior (%) de una estación meteorológica o sonda exterior. Ayuda a entender las condiciones ambientales y el punto de rocío. La máquina no la tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado)."
         },
         "sections": {
           "advanced": {
             "name": "Avanzado: sensores detectados de la máquina",
             "description": "Encontrados automáticamente. Cámbialos solo si sabes lo que haces.",
             "data": {
-              "produced_kwh": "Producción térmica (kWh total)",
-              "consumed_heating_kwh": "Calefacción: consumo (opcional)",
-              "produced_heating_kwh": "Calefacción: producción (opcional)",
-              "consumed_acs_kwh": "ACS: consumo (opcional)",
-              "produced_acs_kwh": "ACS: producción (opcional)",
-              "consumed_cooling_kwh": "Refrigeración: consumo (opcional)",
-              "produced_cooling_kwh": "Refrigeración: producción (opcional)",
-              "compressor_hours": "Horas de compresor (opcional)",
-              "defrost_source": "Señal de desescarche (cuenta los desescarches) (opcional)",
-              "compressor_source": "Señal de compresor en marcha (cuenta los arranques) (opcional)",
+              "produced_kwh": "Sensor de Energía Térmica Producida (kWh, obligatorio)",
+              "consumed_heating_kwh": "Consumo Eléctrico Calefacción (kWh, opcional)",
+              "produced_heating_kwh": "Producción Térmica Calefacción (kWh, opcional)",
+              "consumed_cooling_kwh": "Consumo Eléctrico Refrigeración (kWh, opcional)",
+              "produced_cooling_kwh": "Producción Térmica Frío (Refrigeración) (kWh, opcional)",
+              "consumed_acs_kwh": "Consumo Eléctrico ACS (kWh, opcional)",
+              "produced_acs_kwh": "Producción Térmica ACS (kWh, opcional)",
+              "compressor_hours": "Horas de Compresor (horas, opcional)",
+              "defrost_source": "Contador de Desescarches (Defrost): señal de desescarche (opcional)",
+              "compressor_source": "Arranques de Compresor (Starts): señal de compresor en marcha (opcional)",
+              "target_flow_temp": "Tª Objetivo / Consigna Impulsión (Target / Nominal) (°C, opcional)",
+              "defrost_cycles_initial": "Desescarches totales",
+              "compressor_starts_initial": "Arranques totales del compresor",
               "api_key": "API Key",
               "minute": "Minuto asignado"
             },
             "data_description": {
+              "produced_kwh": "Contador de calor o energía térmica total acumulada continua entregada por la máquina (rendimiento de calor eBUS, Aquarea, Daikin que no vuelve a 0).",
+              "consumed_heating_kwh": "Electricidad consumida exclusivamente en modo calefacción (sensor total acumulado).",
+              "produced_heating_kwh": "Calor útil generado para calentar la vivienda (sensor total acumulado).",
+              "consumed_cooling_kwh": "Electricidad consumida en modo frío / suelo refrescante / fancoils (sensor total acumulado).",
+              "produced_cooling_kwh": "Frío útil entregado a la vivienda en refrigeración (sensor total acumulado).",
+              "consumed_acs_kwh": "Electricidad consumida para calentar el agua sanitaria (sensor total acumulado).",
+              "produced_acs_kwh": "Calor útil entregado al acumulador / interacumulador de ACS (sensor total acumulado).",
+              "compressor_hours": "Contador acumulado de horas de funcionamiento del compresor de la máquina. Permite estimar horas diarias de encendido y modulación media. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
               "defrost_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Desescarches totales.",
               "compressor_source": "La integración cuenta cada paso de apagado a encendido en su propio sensor Arranques totales del compresor.",
+              "target_flow_temp": "No es la impulsión (Ida real), es el objetivo actual (Target / Nominal) que la máquina intenta alcanzar según su curva climática o consigna fijada (en calefacción o refrigeración). Si la máquina está apagada o en standby sin demanda, el sensor debe devolver 0 o null. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+              "defrost_cycles_initial": "El valor actual del contador. Súbelo si hace falta, por ejemplo tras reinstalar la integración. Un valor más bajo no tiene efecto, para que nunca baje en la web.",
+              "compressor_starts_initial": "El valor actual del contador. Súbelo si hace falta, por ejemplo tras reinstalar la integración. Un valor más bajo no tiene efecto, para que nunca baje en la web.",
+              "api_key": "La de tu panel en la web.",
+              "minute": "El minuto que la web asignó a tu máquina (paso 3). No lo cambies salvo que lo cambie la web."
+            }
+          }
+        }
+      },
+      "manual": {
+        "title": "Sensores",
+        "description": "Elige cada sensor a mano. Únicamente son obligatorios el Consumo Eléctrico y la Producción Térmica general. En todos los demás campos, dejar el campo vacío equivale exactamente a no tenerlo configurado. La plataforma espera sensores con contador continuo acumulativo de por vida que nunca vuelvan a cero (ej: medidores Shelly, Wibeee o Modbus). Todos los sensores de energía deben medir en kWh.",
+        "data": {
+          "consumed_kwh": "Sensor de Energía Eléctrica Consumida (kWh, obligatorio)",
+          "produced_kwh": "Sensor de Energía Térmica Producida (kWh, obligatorio)",
+          "compressor_hours": "Horas de Compresor (horas, opcional)",
+          "outdoor_temp": "Temperatura Exterior (°C, opcional)",
+          "indoor_temp": "Temperatura Interior (°C, opcional)",
+          "outdoor_humidity": "Humedad Exterior (%, opcional)",
+          "defrost_cycles": "Contador de Desescarches (Defrost) (ciclos, opcional)",
+          "compressor_starts": "Arranques de Compresor (Starts) (starts, opcional)",
+          "target_flow_temp": "Tª Objetivo / Consigna Impulsión (Target / Nominal) (°C, opcional)"
+        },
+        "data_description": {
+          "consumed_kwh": "Contador de energía eléctrica total acumulada continua (Shelly, Wibeee, Modbus, contador general de la máquina que no vuelve a 0).",
+          "produced_kwh": "Contador de calor o energía térmica total acumulada continua entregada por la máquina (rendimiento de calor eBUS, Aquarea, Daikin que no vuelve a 0).",
+          "compressor_hours": "Contador acumulado de horas de funcionamiento del compresor de la máquina. Permite estimar horas diarias de encendido y modulación media. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "outdoor_temp": "Sonda de temperatura exterior de la propia máquina o de una estación meteorológica en Home Assistant. Fundamental para correlacionar el COP con el clima. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "indoor_temp": "Termostato principal o sensor de temperatura de la estancia de referencia (ej: salón). Muestra el confort térmico interior mantenido. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "outdoor_humidity": "Sensor de humedad relativa exterior (%) de una estación meteorológica o sonda exterior. Ayuda a entender las condiciones ambientales y el punto de rocío. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "defrost_cycles": "Contador de ciclos de desescarche de la bomba de calor (contador total acumulado de por vida). Permite monitorizar cuántas veces invierte ciclo para descongelar la batería exterior. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "compressor_starts": "Contador de arranques / ciclos ON de encendido del compresor (contador total acumulado de por vida). Permite evaluar el cycling y sobre-dimensionamiento de la máquina. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
+          "target_flow_temp": "No es la impulsión (Ida real), es el objetivo actual (Target / Nominal) que la máquina intenta alcanzar según su curva climática o consigna fijada (en calefacción o refrigeración). Si la máquina está apagada o en standby sin demanda, el sensor debe devolver 0 o null. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado)."
+        },
+        "sections": {
+          "breakdown": {
+            "name": "Desglose por Servicio: Calefacción, Refrigeración y ACS (opcional)",
+            "description": "Al indicar estos sensores por separado, la plataforma calculará automáticamente el COP de Calefacción, el COP de Refrigeración (❄️) y el COP de ACS (💧) independientes, evitando mezclar rendimientos entre distintos modos térmicos. Si no dispones de ellos, déjalos en blanco.",
+            "data": {
+              "consumed_heating_kwh": "Consumo Eléctrico Calefacción (kWh, opcional)",
+              "produced_heating_kwh": "Producción Térmica Calefacción (kWh, opcional)",
+              "consumed_cooling_kwh": "Consumo Eléctrico Refrigeración (kWh, opcional)",
+              "produced_cooling_kwh": "Producción Térmica Frío (Refrigeración) (kWh, opcional)",
+              "consumed_acs_kwh": "Consumo Eléctrico ACS (kWh, opcional)",
+              "produced_acs_kwh": "Producción Térmica ACS (kWh, opcional)"
+            },
+            "data_description": {
+              "consumed_heating_kwh": "Electricidad consumida exclusivamente en modo calefacción (sensor total acumulado).",
+              "produced_heating_kwh": "Calor útil generado para calentar la vivienda (sensor total acumulado).",
+              "consumed_cooling_kwh": "Electricidad consumida en modo frío / suelo refrescante / fancoils (sensor total acumulado).",
+              "produced_cooling_kwh": "Frío útil entregado a la vivienda en refrigeración (sensor total acumulado).",
+              "consumed_acs_kwh": "Electricidad consumida para calentar el agua sanitaria (sensor total acumulado).",
+              "produced_acs_kwh": "Calor útil entregado al acumulador / interacumulador de ACS (sensor total acumulado)."
+            }
+          },
+          "connection": {
+            "name": "Conexión con la web",
+            "data": {
+              "api_key": "API Key",
+              "minute": "Minuto asignado"
+            },
+            "data_description": {
               "api_key": "La de tu panel en la web.",
               "minute": "El minuto que la web asignó a tu máquina (paso 3). No lo cambies salvo que lo cambie la web."
             }
@@ -137,6 +280,14 @@
     "button": {
       "push_now": {
         "name": "Enviar ahora"
+      }
+    }
+  },
+  "selector": {
+    "model": {
+      "options": {
+        "midea_esphome": "Midea (y similares, como Ferroli) con ESPHome por Modbus",
+        "other": "Otra: elijo todos los sensores a mano"
       }
     }
   }

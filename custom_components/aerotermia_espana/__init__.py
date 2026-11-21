@@ -21,14 +21,16 @@ from homeassistant.util import dt as dt_util
 from .const import (
     CONF_INSTALLATION_ID,
     CONF_MINUTE,
+    CONF_MODEL,
     COUNTER_SOURCES,
     DASHBOARD_URL,
     DOMAIN,
+    MODEL_OTHER,
     PUSH_URL,
     SENSOR_FIELDS,
     SIGNAL_STATUS,
 )
-from .payload import MissingData, build_payload
+from .payload import MissingData, build_payload, to_count
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.BUTTON, Platform.SENSOR]
@@ -61,6 +63,18 @@ class Pusher:
                 states[field] = state.state if state else None
         return states
 
+    def _counters(self) -> dict[str, int | None]:
+        options = self.entry.options
+        if self.entry.data[CONF_MODEL] != MODEL_OTHER:
+            return dict(self.counters)
+        # "Other": the user picked entities that already hold the totals
+        counters = {}
+        for field in COUNTER_SOURCES:
+            if entity_id := options.get(field):
+                state = self.hass.states.get(entity_id)
+                counters[field] = to_count(state.state if state else None)
+        return counters
+
     async def push(self, delay: int = 0) -> None:
         """Send one payload, after an optional delay (the web requires a random one)."""
         await asyncio.sleep(delay)
@@ -70,7 +84,7 @@ class Pusher:
                 self.installation_id,
                 attempt.strftime("%Y-%m-%d %H:%M:%S"),
                 self._states(),
-                {k: v for k, v in self.counters.items() if self.entry.options.get(COUNTER_SOURCES[k])},
+                self._counters(),
             )
         except MissingData as err:
             _LOGGER.warning("Push skipped, no value for: %s", err)

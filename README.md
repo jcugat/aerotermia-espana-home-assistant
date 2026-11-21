@@ -85,14 +85,33 @@ Necesitas tener [HACS](https://www.hacs.xyz/) instalado.
 
 1. Ve a **Configuración → Dispositivos y servicios → Añadir integración** y busca **Aerotermia España**.
 2. Escribe la **API Key**, el **ID de la máquina** y el **minuto asignado** que apuntaste en la web.
-3. Elige el dispositivo ESPHome de tu aerotermia. La integración busca sus sensores y rellena el siguiente paso.
-   Si no usas el firmware [Midea-heat-pump-ESPHome](https://github.com/jcugat/Midea-heat-pump-ESPHome), déjalo vacío y elige los sensores a mano.
-4. Revisa los sensores:
+3. Elige qué aerotermia tienes. No se puede cambiar después, para cambiarlo hay que borrar la integración y volver a añadirla.
+   - **Midea (y similares, como Ferroli) con ESPHome por Modbus**: si tu máquina lleva el firmware [Midea-heat-pump-ESPHome](https://github.com/jcugat/Midea-heat-pump-ESPHome).
+   - **Otra**: para el resto. Eliges todos los sensores a mano.
+4. Sigue los pasos de tu aerotermia, que están a continuación.
+
+### Midea con ESPHome
+
+1. Elige el dispositivo ESPHome de tu aerotermia. La integración busca sus sensores y rellena el siguiente paso.
+2. Revisa los sensores:
    - Arriba salen el consumo eléctrico y los sensores que la máquina no tiene (temperatura interior y humedad exterior). Si tienes un contador externo como Shelly o Wibeee, elígelo para el consumo, porque es más preciso.
    - En **Avanzado** están el resto de sensores detectados. Normalmente no hay que tocarlos.
-5. Pulsa **Enviar**. A partir de ahí, la integración envía los datos cada hora en tu minuto asignado.
+   - También en **Avanzado** puedes poner el valor inicial de los desescarches y de los arranques del compresor. Déjalos vacíos para empezar en 0.
+3. Pulsa **Enviar**. A partir de ahí, la integración envía los datos cada hora en tu minuto asignado.
+
+La integración cuenta sola los desescarches y los arranques del compresor, con dos sensores propios que nunca bajan.
+
+### Otra aerotermia
+
+1. Elige cada sensor a mano, en el mismo orden que en el paso 2 de tu panel de la web. Solo son obligatorios el consumo eléctrico y la producción térmica. El desglose por calefacción, refrigeración y ACS está en su propia sección.
+2. Para los desescarches y los arranques del compresor, elige una entidad que ya cuente el total, por ejemplo un ayudante **Contador**. Tiene que subir siempre y nunca volver a 0. La integración no crea contadores propios en este caso.
+3. Pulsa **Enviar**. A partir de ahí, la integración envía los datos cada hora en tu minuto asignado.
+
+### Cambiar la configuración
 
 Para revisar o cambiar los sensores más adelante, abre la integración y pulsa **Configurar**. También puedes cambiar ahí la API Key o el minuto.
+
+Con Midea, en **Configurar → Avanzado** salen también los desescarches y los arranques actuales. Si los subes, los contadores siguen desde el nuevo valor. Un valor más bajo no tiene efecto, para que nunca bajen en la web.
 
 Si tienes varias máquinas, añade la integración una vez por cada una. Cada máquina tiene sus propios contadores.
 
@@ -116,34 +135,35 @@ Si antes enviabas los datos con un `rest_command` y una automatización, desact�
 
 Haz lo mismo con las automatizaciones que contaban desescarches o arranques del compresor. La integración tiene sus propios contadores, y si no las quitas los mismos eventos se contarán dos veces.
 
-Los contadores de la integración empiezan en 0, no continúan desde los que tuvieras antes.
+Los contadores de la integración empiezan en 0. Para que sigan desde los que tenías, pon esos valores como valor inicial en **Avanzado** al configurarla, o súbelos después en **Configurar**. Haz lo mismo si borras la integración y la vuelves a añadir, para que los contadores no bajen en la web.
 
 ## Datos que se envían
 
 Esta versión envía a la web estos datos. Solo el consumo eléctrico y la producción térmica son obligatorios. Si un dato opcional no tiene sensor, no se envía.
 
-| Dato | Obligatorio | Sensor del firmware [Midea-heat-pump-ESPHome](https://github.com/jcugat/Midea-heat-pump-ESPHome) |
+| Dato (como en la web) | Obligatorio | Sensor del firmware [Midea-heat-pump-ESPHome](https://github.com/jcugat/Midea-heat-pump-ESPHome) (con Otra los eliges tú) |
 |---|---|---|
-| Consumo eléctrico (kWh) | Sí | Electricity Consumption |
-| Producción térmica (kWh) | Sí | Power Output |
-| Calefacción: consumo (kWh) | No | Total heating power consumed for master unit |
-| Calefacción: producción (kWh) | No | Total heating power produced for master unit |
-| ACS: consumo (kWh) | No | Total DHW power consumed for master unit |
-| ACS: producción (kWh) | No | Total DHW energy produced for master unit |
-| Refrigeración: consumo (kWh) | No | Total cooling power consumed for master unit |
-| Refrigeración: producción (kWh) | No | Total cooling energy produced for master unit |
-| Horas de compresor | No | Compressor Operation Time |
-| Temperatura exterior | No | Outdoor Ambient Temperature |
-| Temperatura interior | No | La máquina no lo tiene. Elige un termómetro de la casa. |
-| Humedad exterior | No | La máquina no lo tiene. Elige una estación meteorológica o una sonda exterior. |
-| Desescarches | No | Los cuenta la integración a partir de Status BIT 1 Defrosting |
-| Arranques del compresor | No | Los cuenta la integración a partir de Compressor Running |
+| Sensor de Energía Eléctrica Consumida (kWh) | Sí | Electricity Consumption |
+| Sensor de Energía Térmica Producida (kWh) | Sí | Power Output |
+| Consumo Eléctrico Calefacción (kWh) | No | Total heating power consumed for master unit |
+| Producción Térmica Calefacción (kWh) | No | Total heating power produced for master unit |
+| Consumo Eléctrico Refrigeración (kWh) | No | Total cooling power consumed for master unit |
+| Producción Térmica Frío (Refrigeración) (kWh) | No | Total cooling energy produced for master unit |
+| Consumo Eléctrico ACS (kWh) | No | Total DHW power consumed for master unit |
+| Producción Térmica ACS (kWh) | No | Total DHW energy produced for master unit |
+| Horas de Compresor (horas) | No | Compressor Operation Time |
+| Temperatura Exterior (°C) | No | Outdoor Ambient Temperature |
+| Temperatura Interior (°C) | No | La máquina no lo tiene. Elige un termómetro de la casa. |
+| Humedad Exterior (%) | No | La máquina no lo tiene. Elige una estación meteorológica o una sonda exterior. |
+| Contador de Desescarches (ciclos) | No | Los cuenta la integración a partir de Status BIT 1 Defrosting. Con Otra, una entidad con el total. |
+| Arranques de Compresor (starts) | No | Los cuenta la integración a partir de Compressor Running. Con Otra, una entidad con el total. |
+| Tª Objetivo / Consigna Impulsión (°C) | No | No se detecta. Elige el sensor de la consigna actual. |
 
 Todos los kWh son contadores totales que nunca vuelven a 0. Si la web añade datos nuevos, saldrán en esta tabla junto con la versión de la integración que los envía.
 
 ## Entidades que crea
 
-Para cada máquina, con su ID en lugar de `<id>`:
+Para cada máquina, con su ID en lugar de `<id>`. Los dos contadores solo se crean con Midea.
 
 | Entidad | Para qué sirve |
 |---|---|
