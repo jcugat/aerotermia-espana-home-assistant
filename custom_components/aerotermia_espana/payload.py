@@ -38,6 +38,29 @@ def to_count(state: str | None) -> int | None:
     return None if value is None else int(value)
 
 
+# Midea "Active State" values with no heating or cooling demand. DHW covers "DHW" and "DHW Heating".
+NO_DEMAND = ("Idle", "Inactive", "DHW")
+# Short pauses inside a heating cycle, which keep the target the machine had
+PAUSES = ("Defrosting", "Oil return")
+
+
+def target_flow_temp(
+    state: str | None, curve_on: bool, fixed: str | None, curve: str | None, last: float | None
+) -> float | None:
+    """The water temperature the machine is aiming for, as the web wants it.
+
+    0 when it is off, idle or heating DHW. The climate curve's value when the curve is on,
+    the fixed setpoint otherwise. Unchanged during a defrost or oil return.
+    """
+    if state is None or state in ("unknown", "unavailable"):
+        return None
+    if state.startswith(NO_DEMAND):
+        return 0.0
+    if state in PAUSES:
+        return last
+    return to_number(curve if curve_on else fixed)
+
+
 def build_payload(
     installation_id: int,
     local_datetime: str,

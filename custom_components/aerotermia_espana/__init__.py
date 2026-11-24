@@ -14,26 +14,50 @@ from homeassistant.const import CONF_API_KEY, Platform
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_change
 from homeassistant.util import dt as dt_util
 
 from .const import (
+    CONF_DEVICE_ID,
     CONF_INSTALLATION_ID,
     CONF_MINUTE,
     CONF_MODEL,
     COUNTER_SOURCES,
     DASHBOARD_URL,
     DOMAIN,
+    ESPHOME_NAMES,
     MODEL_OTHER,
+    PRODUCED,
     PUSH_URL,
     SENSOR_FIELDS,
     SIGNAL_STATUS,
+    TARGET_FLOW_TEMP,
 )
 from .payload import MissingData, build_payload, to_count
 
 _LOGGER = logging.getLogger(__name__)
 PLATFORMS = [Platform.BUTTON, Platform.SENSOR]
+
+
+def detect_entities(hass: HomeAssistant, device_id: str | None, names: dict = ESPHOME_NAMES) -> dict[str, str]:
+    """Map each key to the device's entity with that firmware name."""
+    entries = er.async_entries_for_device(er.async_get(hass), device_id) if device_id else []
+    by_name = {(e.domain, (e.original_name or "").lower()): e.entity_id for e in entries}
+    return {
+        key: by_name[(domain, name.lower())]
+        for key, (domain, name) in names.items()
+        if (domain, name.lower()) in by_name
+    }
+
+
+def device_of(hass: HomeAssistant, entry: ConfigEntry) -> str | None:
+    """The Midea ESPHome device. Entries made with 1.0.0 did not store it, so take it from the produced energy sensor."""
+    if device_id := entry.data.get(CONF_DEVICE_ID):
+        return device_id
+    entity = er.async_get(hass).async_get(entry.options.get(PRODUCED, ""))
+    return entity.device_id if entity else None
 
 
 class Pusher:
@@ -44,6 +68,9 @@ class Pusher:
         self.entry = entry
         self.installation_id: int = entry.data[CONF_INSTALLATION_ID]
         self.counters: dict[str, int | None] = {}  # filled by the counter sensors
+        self.target: float | None = None  # filled by the target flow temperature sensor (Midea)
+        self.has_target = False  # that sensor exists, so the target is sent even while it has no value
+        self.midea = entry.data[CONF_MODEL] != MODEL_OTHER
         self.status: str | None = None
         self.attributes: dict = {}
         self.device_info = DeviceInfo(
@@ -58,15 +85,22 @@ class Pusher:
         options = self.entry.options
         states = {}
         for field in SENSOR_FIELDS:
+            # Midea: the integration computes the target itself, see _computed
+            if self.midea and field == TARGET_FLOW_TEMP:
+                continue
             if entity_id := options.get(field):
                 state = self.hass.states.get(entity_id)
                 states[field] = state.state if state else None
         return states
 
-    def _counters(self) -> dict[str, int | None]:
+    def _computed(self) -> dict[str, float | int | None]:
+        """Values the integration works out itself, sent after the mapped sensors."""
         options = self.entry.options
-        if self.entry.data[CONF_MODEL] != MODEL_OTHER:
-            return dict(self.counters)
+        if self.midea:
+            computed: dict[str, float | int | None] = dict(self.counters)
+            if self.has_target:
+                computed[TARGET_FLOW_TEMP] = self.target
+            return computed
         # "Other": the user picked entities that already hold the totals
         counters = {}
         for field in COUNTER_SOURCES:
@@ -84,7 +118,7 @@ class Pusher:
                 self.installation_id,
                 attempt.strftime("%Y-%m-%d %H:%M:%S"),
                 self._states(),
-                self._counters(),
+                self._computed(),
             )
         except MissingData as err:
             _LOGGER.warning("Push skipped, no value for: %s", err)

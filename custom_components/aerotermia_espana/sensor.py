@@ -8,13 +8,21 @@ from homeassistant.components.sensor import (
     SensorEntity,
     SensorStateClass,
 )
-from homeassistant.const import EntityCategory
+from homeassistant.const import EntityCategory, UnitOfTemperature
 from homeassistant.core import Event, EventStateChangedData, callback
 from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.event import async_track_state_change_event
 
-from . import Pusher
-from .const import COMPRESSOR_STARTS, COUNTER_INITIAL, COUNTER_SOURCES, DEFROST_CYCLES, SIGNAL_STATUS
+from . import Pusher, detect_entities, device_of
+from .const import (
+    COMPRESSOR_STARTS,
+    COUNTER_INITIAL,
+    COUNTER_SOURCES,
+    DEFROST_CYCLES,
+    SIGNAL_STATUS,
+    TARGET_SOURCES,
+)
+from .payload import target_flow_temp
 
 # The slug is the translation key and the entity_id suffix
 COUNTERS = {
@@ -30,6 +38,11 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
     for field, source_key in COUNTER_SOURCES.items():
         if source := entry.options.get(source_key):
             entities.append(CounterSensor(pusher, field, source))
+    if pusher.midea:
+        sources = detect_entities(hass, device_of(hass, entry), TARGET_SOURCES)
+        # Needs the machine's state and at least one setpoint to work anything out
+        if "state" in sources and ({"fixed", "curve"} & sources.keys()):
+            entities.append(TargetFlowTempSensor(pusher, sources))
     async_add_entities(entities)
 
 
@@ -73,6 +86,54 @@ class CounterSensor(RestoreSensor):
             return
         self._attr_native_value += 1
         self._pusher.counters[self._field] = self._attr_native_value
+        self.async_write_ha_state()
+
+
+class TargetFlowTempSensor(SensorEntity):
+    """Midea: the flow temperature the machine aims for, worked out as the web expects it."""
+
+    _attr_has_entity_name = True
+    _attr_translation_key = "target_flow_temp"
+    _attr_device_class = SensorDeviceClass.TEMPERATURE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+
+    def __init__(self, pusher: Pusher, sources: dict[str, str]) -> None:
+        self._pusher = pusher
+        self._sources = sources
+        self._attr_unique_id = f"{pusher.installation_id}_target_flow_temp"
+        self._attr_device_info = pusher.device_info
+        self.entity_id = f"sensor.aerotermia_{pusher.installation_id}_target_flow_temp"
+        self._attr_extra_state_attributes = {"sources": sources}
+
+    async def async_added_to_hass(self) -> None:
+        self._pusher.has_target = True
+        self._update()
+        self.async_on_remove(
+            async_track_state_change_event(self.hass, list(self._sources.values()), self._on_change)
+        )
+
+    async def async_will_remove_from_hass(self) -> None:
+        self._pusher.has_target = False
+
+    def _state(self, key: str) -> str | None:
+        state = self.hass.states.get(self._sources.get(key, ""))
+        return state.state if state else None
+
+    def _update(self) -> None:
+        value = target_flow_temp(
+            self._state("state"),
+            self._state("curve_switch") == "on",
+            self._state("fixed"),
+            self._state("curve"),
+            self._attr_native_value,
+        )
+        self._attr_native_value = value
+        self._pusher.target = value
+
+    @callback
+    def _on_change(self, _event: Event[EventStateChangedData]) -> None:
+        self._update()
         self.async_write_ha_state()
 
 

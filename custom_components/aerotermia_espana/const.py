@@ -30,18 +30,13 @@ DEFROST_CYCLES = "defrost_cycles"
 COMPRESSOR_STARTS = "compressor_starts"
 TARGET_FLOW_TEMP = "target_flow_temp"
 
-# Midea: how the target is chosen. Fixed and curve map to the firmware entities below.
-CONF_TARGET_MODE = "target_mode"
-TARGET_FIXED = "fixed"
-TARGET_CURVE = "curve"
-TARGET_CUSTOM = "custom"
-TARGET_NONE = "none"
-TARGET_NAMES = {
-    TARGET_FIXED: ("number", "Set Water Temperature T1S Zone 1"),
-    TARGET_CURVE: ("sensor", "Climate Curve T1S Calculated Value 1"),
+# Midea: firmware entities the integration computes the target flow temperature from
+TARGET_SOURCES = {
+    "state": ("sensor", "Active State"),
+    "fixed": ("number", "Set Water Temperature T1S Zone 1"),
+    "curve": ("sensor", "Climate Curve T1S Calculated Value 1"),
+    "curve_switch": ("switch", "Weather Compensation Zone 1"),
 }
-# On when the zone 1 climate curve drives the water temperature
-CURVE_SWITCH = ("switch", "Weather Compensation Zone 1")
 
 # Binary sensors the integration counts to produce the two counter fields
 DEFROST_SOURCE = "defrost_source"

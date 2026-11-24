@@ -95,12 +95,21 @@ Necesitas tener [HACS](https://www.hacs.xyz/) instalado.
 1. Elige el dispositivo ESPHome de tu aerotermia. La integración busca sus sensores y rellena el siguiente paso.
 2. Revisa los sensores:
    - Arriba salen el consumo eléctrico y los sensores que la máquina no tiene (temperatura interior y humedad exterior). Si tienes un contador externo como Shelly o Wibeee, elígelo para el consumo, porque es más preciso.
-   - En **Tª Objetivo / Consigna Impulsión** elige si tu máquina usa una temperatura de impulsión fija o la curva climática, otra entidad (**Personalizada**) o **No enviar la consigna**. Sale marcada la que usa tu máquina ahora, según su ajuste Weather Compensation Zone 1.
    - En **Avanzado** están el resto de sensores detectados. Normalmente no hay que tocarlos.
    - También en **Avanzado** puedes poner el valor inicial de los desescarches y de los arranques del compresor. Déjalos vacíos para empezar en 0.
 3. Pulsa **Enviar**. A partir de ahí, la integración envía los datos cada hora en tu minuto asignado.
 
 La integración cuenta sola los desescarches y los arranques del compresor, con dos sensores propios que nunca bajan.
+
+También calcula la consigna (Tª Objetivo / Consigna Impulsión) en su sensor **Consigna de impulsión**:
+
+| Estado de la máquina (Active State) | Consigna |
+|---|---|
+| Calefacción o refrigeración | Climate Curve T1S Calculated Value 1 si la curva climática está activada (Weather Compensation Zone 1), Set Water Temperature T1S Zone 1 si no |
+| Desescarche o retorno de aceite | La misma que tenía, son pausas cortas |
+| Apagada, sin demanda o haciendo ACS | 0, como pide la web |
+
+Se envía el valor del momento del envío, como el resto de temperaturas.
 
 ### Otra aerotermia
 
@@ -158,18 +167,19 @@ Esta versión envía a la web estos datos. Solo el consumo eléctrico y la produ
 | Humedad Exterior (%) | No | La máquina no lo tiene. Elige una estación meteorológica o una sonda exterior. |
 | Contador de Desescarches (ciclos) | No | Los cuenta la integración a partir de Status BIT 1 Defrosting. Con Otra, una entidad con el total. |
 | Arranques de Compresor (starts) | No | Los cuenta la integración a partir de Compressor Running. Con Otra, una entidad con el total. |
-| Tª Objetivo / Consigna Impulsión (°C) | No | Set Water Temperature T1S Zone 1 (impulsión fija) o Climate Curve T1S Calculated Value 1 (curva climática), según Weather Compensation Zone 1. |
+| Tª Objetivo / Consigna Impulsión (°C) | No | La calcula la integración con Active State, Weather Compensation Zone 1, Climate Curve T1S Calculated Value 1 y Set Water Temperature T1S Zone 1. Con Otra, la eliges tú. |
 
 Todos los kWh son contadores totales que nunca vuelven a 0. Si la web añade datos nuevos, saldrán en esta tabla junto con la versión de la integración que los envía.
 
 ## Entidades que crea
 
-Para cada máquina, con su ID en lugar de `<id>`. Los dos contadores solo se crean con Midea.
+Para cada máquina, con su ID en lugar de `<id>`. Los dos contadores y la consigna solo se crean con Midea.
 
 | Entidad | Para qué sirve |
 |---|---|
 | `sensor.aerotermia_<id>_defrost_cycles_total` | Desescarches totales. Nunca vuelve a 0. |
 | `sensor.aerotermia_<id>_compressor_starts_total` | Arranques totales del compresor. Nunca vuelve a 0. |
+| `sensor.aerotermia_<id>_target_flow_temp` | Consigna de impulsión calculada por la integración. Solo con Midea. |
 | `sensor.aerotermia_<id>_push_status` | Estado del último envío, con la petición y la respuesta como atributos. |
 | `button.aerotermia_<id>_push_now` | Envía los datos al momento. |
 

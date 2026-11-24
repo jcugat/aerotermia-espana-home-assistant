@@ -31,22 +31,18 @@
       },
       "sensors": {
         "title": "Sensores",
-        "description": "Se han encontrado {detected} sensores. Únicamente son obligatorios el Consumo Eléctrico y la Producción Térmica general. En todos los demás campos, dejar el campo vacío equivale exactamente a no tenerlo configurado. La plataforma espera sensores con contador continuo acumulativo de por vida que nunca vuelvan a cero (ej: medidores Shelly, Wibeee o Modbus). Todos los sensores de energía deben medir en kWh.",
+        "description": "Se han encontrado {detected} sensores. Únicamente son obligatorios el Consumo Eléctrico y la Producción Térmica general. En todos los demás campos, dejar el campo vacío equivale exactamente a no tenerlo configurado. La plataforma espera sensores con contador continuo acumulativo de por vida que nunca vuelvan a cero (ej: medidores Shelly, Wibeee o Modbus). Todos los sensores de energía deben medir en kWh. La Tª Objetivo / Consigna Impulsión la calcula la integración en su sensor Consigna de impulsión: la de la curva climática o la fija según tengas la curva activada, y 0 con la máquina parada, sin demanda o haciendo ACS.",
         "data": {
           "consumed_kwh": "Sensor de Energía Eléctrica Consumida (kWh, obligatorio)",
           "outdoor_temp": "Temperatura Exterior (°C, opcional)",
           "indoor_temp": "Temperatura Interior (°C, opcional)",
-          "outdoor_humidity": "Humedad Exterior (%, opcional)",
-          "target_mode": "Tª Objetivo / Consigna Impulsión (Target / Nominal) (°C, opcional)",
-          "target_flow_temp": "Consigna personalizada"
+          "outdoor_humidity": "Humedad Exterior (%, opcional)"
         },
         "data_description": {
           "consumed_kwh": "Contador de energía eléctrica total acumulada continua (Shelly, Wibeee, Modbus, contador general de la máquina que no vuelve a 0). Por defecto el contador de la propia máquina. Si tienes un contador externo (Shelly, Wibeee...) elígelo, es más preciso.",
           "outdoor_temp": "Sonda de temperatura exterior de la propia máquina o de una estación meteorológica en Home Assistant. Fundamental para correlacionar el COP con el clima. Por defecto la sonda de la máquina. Puedes elegir tu propio termómetro exterior. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
           "indoor_temp": "Termostato principal o sensor de temperatura de la estancia de referencia (ej: salón). Muestra el confort térmico interior mantenido. La máquina no lo tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
-          "outdoor_humidity": "Sensor de humedad relativa exterior (%) de una estación meteorológica o sonda exterior. Ayuda a entender las condiciones ambientales y el punto de rocío. La máquina no la tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
-          "target_mode": "No es la impulsión (Ida real), es el objetivo actual (Target / Nominal) que la máquina intenta alcanzar según su curva climática o consigna fijada (en calefacción o refrigeración). Si la máquina está apagada o en standby sin demanda, el sensor debe devolver 0 o null. Si usas temperatura de impulsión fija, elige la primera opción. Si usas curva climática, la segunda. Si quieres otra entidad, elige Personalizada y escógela en el campo de abajo. Sale marcada la que usa tu máquina ahora.",
-          "target_flow_temp": "Solo si has elegido Personalizada arriba. Con las otras opciones se ignora."
+          "outdoor_humidity": "Sensor de humedad relativa exterior (%) de una estación meteorológica o sonda exterior. Ayuda a entender las condiciones ambientales y el punto de rocío. La máquina no la tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado)."
         },
         "sections": {
           "advanced": {
@@ -135,9 +131,7 @@
     "error": {
       "installation_id_missing": "Escribe el ID de la máquina, el número tras # en tu panel de la web.",
       "minute_missing": "Escribe el minuto asignado, lo tienes en el paso 3 de tu panel de la web.",
-      "model_missing": "Elige qué aerotermia tienes.",
-      "target_flow_temp_missing": "Elige la entidad de la consigna personalizada, o cambia de opción.",
-      "target_not_found": "Tu dispositivo ESPHome no tiene esta entidad. Elige Personalizada o No enviar la consigna."
+      "model_missing": "Elige qué aerotermia tienes."
     },
     "abort": {
       "already_configured": "Esta máquina ya está configurada."
@@ -147,22 +141,18 @@
     "step": {
       "init": {
         "title": "Sensores",
-        "description": "Únicamente son obligatorios el Consumo Eléctrico y la Producción Térmica general. En todos los demás campos, dejar el campo vacío equivale exactamente a no tenerlo configurado. La plataforma espera sensores con contador continuo acumulativo de por vida que nunca vuelvan a cero (ej: medidores Shelly, Wibeee o Modbus). Todos los sensores de energía deben medir en kWh.",
+        "description": "Únicamente son obligatorios el Consumo Eléctrico y la Producción Térmica general. En todos los demás campos, dejar el campo vacío equivale exactamente a no tenerlo configurado. La plataforma espera sensores con contador continuo acumulativo de por vida que nunca vuelvan a cero (ej: medidores Shelly, Wibeee o Modbus). Todos los sensores de energía deben medir en kWh. La Tª Objetivo / Consigna Impulsión la calcula la integración en su sensor Consigna de impulsión: la de la curva climática o la fija según tengas la curva activada, y 0 con la máquina parada, sin demanda o haciendo ACS.",
         "data": {
           "consumed_kwh": "Sensor de Energía Eléctrica Consumida (kWh, obligatorio)",
           "outdoor_temp": "Temperatura Exterior (°C, opcional)",
           "indoor_temp": "Temperatura Interior (°C, opcional)",
-          "outdoor_humidity": "Humedad Exterior (%, opcional)",
-          "target_mode": "Tª Objetivo / Consigna Impulsión (Target / Nominal) (°C, opcional)",
-          "target_flow_temp": "Consigna personalizada"
+          "outdoor_humidity": "Humedad Exterior (%, opcional)"
         },
         "data_description": {
           "consumed_kwh": "Contador de energía eléctrica total acumulada continua (Shelly, Wibeee, Modbus, contador general de la máquina que no vuelve a 0). Por defecto el contador de la propia máquina. Si tienes un contador externo (Shelly, Wibeee...) elígelo, es más preciso.",
           "outdoor_temp": "Sonda de temperatura exterior de la propia máquina o de una estación meteorológica en Home Assistant. Fundamental para correlacionar el COP con el clima. Por defecto la sonda de la máquina. Puedes elegir tu propio termómetro exterior. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
           "indoor_temp": "Termostato principal o sensor de temperatura de la estancia de referencia (ej: salón). Muestra el confort térmico interior mantenido. La máquina no lo tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
-          "outdoor_humidity": "Sensor de humedad relativa exterior (%) de una estación meteorológica o sonda exterior. Ayuda a entender las condiciones ambientales y el punto de rocío. La máquina no la tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado).",
-          "target_mode": "No es la impulsión (Ida real), es el objetivo actual (Target / Nominal) que la máquina intenta alcanzar según su curva climática o consigna fijada (en calefacción o refrigeración). Si la máquina está apagada o en standby sin demanda, el sensor debe devolver 0 o null. Si usas temperatura de impulsión fija, elige la primera opción. Si usas curva climática, la segunda. Si quieres otra entidad, elige Personalizada y escógela en el campo de abajo. Sale marcada la que usa tu máquina ahora.",
-          "target_flow_temp": "Solo si has elegido Personalizada arriba. Con las otras opciones se ignora."
+          "outdoor_humidity": "Sensor de humedad relativa exterior (%) de una estación meteorológica o sonda exterior. Ayuda a entender las condiciones ambientales y el punto de rocío. La máquina no la tiene. Opcional: déjalo vacío si no dispones de este sensor (equivale a no tenerlo configurado)."
         },
         "sections": {
           "advanced": {
@@ -262,10 +252,6 @@
           }
         }
       }
-    },
-    "error": {
-      "target_flow_temp_missing": "Elige la entidad de la consigna personalizada, o cambia de opción.",
-      "target_not_found": "Tu dispositivo ESPHome no tiene esta entidad. Elige Personalizada o No enviar la consigna."
     }
   },
   "entity": {
@@ -285,6 +271,9 @@
       },
       "compressor_starts_total": {
         "name": "Arranques totales del compresor"
+      },
+      "target_flow_temp": {
+        "name": "Consigna de impulsión"
       }
     },
     "button": {
@@ -298,14 +287,6 @@
       "options": {
         "midea_esphome": "Midea (y similares, como Ferroli) con ESPHome por Modbus",
         "other": "Otra: elijo todos los sensores a mano"
-      }
-    },
-    "target_mode": {
-      "options": {
-        "fixed": "Temperatura de impulsión fija (Set Water Temperature T1S Zone 1)",
-        "curve": "Curva climática (Climate Curve T1S Calculated Value 1)",
-        "custom": "Personalizada: la eliges en el campo de abajo",
-        "none": "No enviar la consigna"
       }
     }
   }

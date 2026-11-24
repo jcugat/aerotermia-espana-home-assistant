@@ -52,6 +52,19 @@ def test_counter_from_entity():
     assert payload.to_count("unavailable") is None
 
 
+def test_target_flow_temp():
+    t = payload.target_flow_temp
+    assert t("Heating", False, "37", "41.5", None) == 37.0
+    assert t("Heating", True, "37", "41.5", None) == 41.5
+    assert t("Cooling", False, "18", None, None) == 18.0
+    for state in ("Idle", "Inactive", "DHW", "DHW Heating"):
+        assert t(state, False, "37", "41.5", 37.0) == 0.0
+    assert t("Defrosting", False, "37", "41.5", 37.0) == 37.0
+    assert t("Oil return", True, "37", "41.5", 41.5) == 41.5
+    assert t("unavailable", False, "37", None, 37.0) is None
+    assert t("Heating", True, "37", "unavailable", None) is None
+
+
 if __name__ == "__main__":
     for name, fn in list(globals().items()):
         if name.startswith("test_"):
