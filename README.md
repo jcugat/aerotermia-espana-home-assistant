@@ -95,6 +95,7 @@ Necesitas tener [HACS](https://www.hacs.xyz/) instalado.
 1. Elige el dispositivo ESPHome de tu aerotermia. La integración busca sus sensores y rellena el siguiente paso.
 2. Revisa los sensores:
    - Arriba salen el consumo eléctrico y los sensores que la máquina no tiene (temperatura interior y humedad exterior). Si tienes un contador externo como Shelly o Wibeee, elígelo para el consumo, porque es más preciso.
+   - En **Tª Objetivo / Consigna Impulsión** elige si tu máquina usa una temperatura de impulsión fija o la curva climática, otra entidad (**Personalizada**) o **No enviar la consigna**. Sale marcada la que usa tu máquina ahora, según su ajuste Weather Compensation Zone 1.
    - En **Avanzado** están el resto de sensores detectados. Normalmente no hay que tocarlos.
    - También en **Avanzado** puedes poner el valor inicial de los desescarches y de los arranques del compresor. Déjalos vacíos para empezar en 0.
 3. Pulsa **Enviar**. A partir de ahí, la integración envía los datos cada hora en tu minuto asignado.
@@ -157,7 +158,7 @@ Esta versión envía a la web estos datos. Solo el consumo eléctrico y la produ
 | Humedad Exterior (%) | No | La máquina no lo tiene. Elige una estación meteorológica o una sonda exterior. |
 | Contador de Desescarches (ciclos) | No | Los cuenta la integración a partir de Status BIT 1 Defrosting. Con Otra, una entidad con el total. |
 | Arranques de Compresor (starts) | No | Los cuenta la integración a partir de Compressor Running. Con Otra, una entidad con el total. |
-| Tª Objetivo / Consigna Impulsión (°C) | No | No se detecta. Elige el sensor de la consigna actual. |
+| Tª Objetivo / Consigna Impulsión (°C) | No | Set Water Temperature T1S Zone 1 (impulsión fija) o Climate Curve T1S Calculated Value 1 (curva climática), según Weather Compensation Zone 1. |
 
 Todos los kWh son contadores totales que nunca vuelven a 0. Si la web añade datos nuevos, saldrán en esta tabla junto con la versión de la integración que los envía.
 

@@ -28,7 +28,9 @@ from .const import (
     CONSUMED_ACS,
     CONSUMED_COOLING,
     CONSUMED_HEATING,
+    CONF_TARGET_MODE,
     COUNTER_INITIAL,
+    CURVE_SWITCH,
     DEFROST_CYCLES,
     DEFROST_SOURCE,
     DOMAIN,
@@ -42,7 +44,12 @@ from .const import (
     PRODUCED_ACS,
     PRODUCED_COOLING,
     PRODUCED_HEATING,
+    TARGET_CURVE,
+    TARGET_CUSTOM,
+    TARGET_FIXED,
     TARGET_FLOW_TEMP,
+    TARGET_NAMES,
+    TARGET_NONE,
 )
 
 ADVANCED = "advanced"
@@ -84,7 +91,6 @@ ADVANCED_FIELDS = {
     COMPRESSOR_HOURS: _TOTAL,
     DEFROST_SOURCE: _entity("binary_sensor"),
     COMPRESSOR_SOURCE: _entity("binary_sensor"),
-    TARGET_FLOW_TEMP: _TARGET,
 }
 # "Other": everything by hand, with the per-service breakdown in its own section as on the web
 MANUAL_HEAD = {CONSUMED: _ENERGY, PRODUCED: _ENERGY}
@@ -108,6 +114,13 @@ MANUAL_TAIL = {
 _COUNT = sel.NumberSelector(sel.NumberSelectorConfig(min=0, mode=sel.NumberSelectorMode.BOX))
 _MINUTE = sel.NumberSelector(sel.NumberSelectorConfig(min=0, max=59, mode=sel.NumberSelectorMode.BOX))
 _PASSWORD = sel.TextSelector(sel.TextSelectorConfig(type=sel.TextSelectorType.PASSWORD))
+_TARGET_MODE = sel.SelectSelector(
+    sel.SelectSelectorConfig(
+        options=[TARGET_FIXED, TARGET_CURVE, TARGET_CUSTOM, TARGET_NONE],
+        mode=sel.SelectSelectorMode.LIST,
+        translation_key=CONF_TARGET_MODE,
+    )
+)
 _MODEL = sel.SelectSelector(
     sel.SelectSelectorConfig(
         options=[MODEL_MIDEA_ESPHOME, MODEL_OTHER],
@@ -117,15 +130,44 @@ _MODEL = sel.SelectSelector(
 )
 
 
-def detect_entities(hass: HomeAssistant, device_id: str) -> dict[str, str]:
-    """Map payload fields to the device's entities by their firmware name."""
+def detect_entities(hass: HomeAssistant, device_id: str, names: dict = ESPHOME_NAMES) -> dict[str, str]:
+    """Map each key to the device's entity with that firmware name."""
     entries = er.async_entries_for_device(er.async_get(hass), device_id)
     by_name = {(e.domain, (e.original_name or "").lower()): e.entity_id for e in entries}
     return {
-        field: by_name[(domain, name.lower())]
-        for field, (domain, name) in ESPHOME_NAMES.items()
+        key: by_name[(domain, name.lower())]
+        for key, (domain, name) in names.items()
         if (domain, name.lower()) in by_name
     }
+
+
+def detect_target(hass: HomeAssistant, device_id: str) -> tuple[dict[str, str], str]:
+    """The fixed and curve setpoint entities, and the mode the machine uses right now."""
+    found = detect_entities(hass, device_id, TARGET_NAMES | {"switch": CURVE_SWITCH})
+    switch = hass.states.get(found.pop("switch", ""))
+    mode = TARGET_CURVE if switch and switch.state == "on" else TARGET_FIXED
+    return found, mode if mode in found else TARGET_NONE
+
+
+def target_mode_of(entity_id: str | None, targets: dict[str, str]) -> str:
+    """The mode matching an entity chosen before modes existed (entries made with 1.0.0)."""
+    if not entity_id:
+        return TARGET_NONE
+    return next((mode for mode, target in targets.items() if target == entity_id), TARGET_CUSTOM)
+
+
+def apply_target(data: dict, targets: dict[str, str]) -> dict[str, str]:
+    """Turn the chosen target mode into the entity to send, in place. Returns the form errors."""
+    mode = data[CONF_TARGET_MODE]
+    if mode == TARGET_CUSTOM:
+        return {} if data.get(TARGET_FLOW_TEMP) else {TARGET_FLOW_TEMP: "target_flow_temp_missing"}
+    data.pop(TARGET_FLOW_TEMP, None)
+    if mode == TARGET_NONE:
+        return {}
+    if mode not in targets:
+        return {CONF_TARGET_MODE: "target_not_found"}
+    data[TARGET_FLOW_TEMP] = targets[mode]
+    return {}
 
 
 def _fields(selectors: dict, values: dict) -> dict:
@@ -150,6 +192,11 @@ def sensors_schema(values: dict, with_connection: bool = False) -> vol.Schema:
     if with_connection:
         advanced |= _connection(values)
     schema = _fields(BASIC_FIELDS, values)
+    mode = values[CONF_TARGET_MODE]
+    schema[vol.Required(CONF_TARGET_MODE, default=mode)] = _TARGET_MODE
+    # Always shown, as a form cannot hide it, but only used with the custom mode
+    custom = values.get(TARGET_FLOW_TEMP) if mode == TARGET_CUSTOM else None
+    schema[vol.Optional(TARGET_FLOW_TEMP, description={"suggested_value": custom} if custom else None)] = _TARGET
     schema[vol.Required(ADVANCED)] = section(
         vol.Schema(advanced), {"collapsed": bool(values.get(PRODUCED))}
     )
@@ -187,6 +234,8 @@ class AerotermiaConfigFlow(ConfigFlow, domain=DOMAIN):
     def __init__(self) -> None:
         self._data: dict[str, Any] = {}
         self._options: dict[str, Any] = {}
+        self._targets: dict[str, str] = {}
+        self._detected = 0
 
     async def async_step_user(self, user_input: dict | None = None) -> ConfigFlowResult:
         """API key, machine id and minute, all copied from the web panel."""
@@ -246,7 +295,12 @@ class AerotermiaConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_device(self, user_input: dict | None = None) -> ConfigFlowResult:
         """Pick the ESPHome heat pump so its sensors are found automatically."""
         if user_input is not None:
-            self._options |= detect_entities(self.hass, user_input[CONF_DEVICE_ID])
+            device_id = user_input[CONF_DEVICE_ID]
+            self._data[CONF_DEVICE_ID] = device_id
+            found = detect_entities(self.hass, device_id)
+            self._detected = len(found)
+            self._targets, self._options[CONF_TARGET_MODE] = detect_target(self.hass, device_id)
+            self._options |= found
             return await self.async_step_sensors()
 
         return self.async_show_form(
@@ -262,24 +316,30 @@ class AerotermiaConfigFlow(ConfigFlow, domain=DOMAIN):
 
     async def async_step_sensors(self, user_input: dict | None = None) -> ConfigFlowResult:
         """Midea: review and adjust the detected sensors."""
+        errors: dict[str, str] = {}
+        values = self._options
         if user_input is not None:
-            return self._create(user_input)
+            data = flatten(user_input)
+            if not (errors := apply_target(data, self._targets)):
+                return self._create(data)
+            values = self._options | data
 
         return self.async_show_form(
             step_id="sensors",
-            data_schema=sensors_schema(self._options),
-            description_placeholders={"detected": str(len(self._options) - 2)},
+            data_schema=sensors_schema(values),
+            description_placeholders={"detected": str(self._detected)},
+            errors=errors,
         )
 
     async def async_step_manual(self, user_input: dict | None = None) -> ConfigFlowResult:
         """Other: pick every sensor by hand."""
         if user_input is not None:
-            return self._create(user_input)
+            return self._create(flatten(user_input))
 
         return self.async_show_form(step_id="manual", data_schema=manual_schema(self._options))
 
-    def _create(self, user_input: dict) -> ConfigFlowResult:
-        options = {k: self._options[k] for k in (CONF_API_KEY, CONF_MINUTE)} | flatten(user_input)
+    def _create(self, data: dict) -> ConfigFlowResult:
+        options = {k: self._options[k] for k in (CONF_API_KEY, CONF_MINUTE)} | data
         return self.async_create_entry(
             title=f"Aerotermia España #{self._data[CONF_INSTALLATION_ID]}",
             data=self._data,
@@ -298,16 +358,30 @@ class AerotermiaOptionsFlow(OptionsFlow):
     async def async_step_init(self, user_input: dict | None = None) -> ConfigFlowResult:
         if self.config_entry.data[CONF_MODEL] == MODEL_OTHER:
             return await self.async_step_manual()
+        errors: dict[str, str] = {}
+        targets, _ = detect_target(self.hass, self._device_id())
         if user_input is not None:
-            return self.async_create_entry(data=flatten(user_input))
-
-        values = dict(self.config_entry.options)
-        # Show each counter's current value, so raising it starts from what it holds now
-        if pusher := getattr(self.config_entry, "runtime_data", None):
-            values |= {COUNTER_INITIAL[k]: v for k, v in pusher.counters.items() if v is not None}
+            data = flatten(user_input)
+            if not (errors := apply_target(data, targets)):
+                return self.async_create_entry(data=data)
+            values = data
+        else:
+            values = dict(self.config_entry.options)
+            if CONF_TARGET_MODE not in values:
+                values[CONF_TARGET_MODE] = target_mode_of(values.get(TARGET_FLOW_TEMP), targets)
+            # Show each counter's current value, so raising it starts from what it holds now
+            if pusher := getattr(self.config_entry, "runtime_data", None):
+                values |= {COUNTER_INITIAL[k]: v for k, v in pusher.counters.items() if v is not None}
         return self.async_show_form(
-            step_id="init", data_schema=sensors_schema(values, with_connection=True)
+            step_id="init", data_schema=sensors_schema(values, with_connection=True), errors=errors
         )
+
+    def _device_id(self) -> str | None:
+        """The ESPHome device. Entries made with 1.0.0 did not store it, so take it from the produced energy sensor."""
+        if device_id := self.config_entry.data.get(CONF_DEVICE_ID):
+            return device_id
+        entity = er.async_get(self.hass).async_get(self.config_entry.options.get(PRODUCED, ""))
+        return entity.device_id if entity else None
 
     async def async_step_manual(self, user_input: dict | None = None) -> ConfigFlowResult:
         if user_input is not None:
